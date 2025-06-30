@@ -10,6 +10,9 @@ import { ApiProvider } from './context/ApiContext';
 import Layout from './components/Layout/Layout';
 import Welcome from './pages/Welcome';
 import Login from './pages/Login';
+import LoginPage from './pages/LoginPage';
+import HalamanSiswa from './pages/HalamanSiswa';
+import HalamanGuru from './pages/HalamanGuru';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Classes from './pages/Classes';
@@ -26,6 +29,9 @@ function App() {
           <Routes>
             <Route path='/welcome' element={<Welcome />} />
             <Route path='/login' element={<Login />} />
+            <Route path='/login-page' element={<LoginPage />} />
+            <Route path='/halaman-siswa' element={<HalamanSiswa />} />
+            <Route path='/halaman-guru' element={<HalamanGuru />} />
 
             {/* Dashboard and nested routes */}
             <Route

@@ -99,3 +99,4 @@ const AtThahirinLogo = ({ className = 'w-8 h-8', showText = false }) => {
 };
 
 export default AtThahirinLogo;
+export { AtThahirinLogo };

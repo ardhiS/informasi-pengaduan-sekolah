@@ -38,11 +38,18 @@ const Welcome = () => {
             {/* Mobile-friendly buttons */}
             <div className='flex flex-col xs:flex-row gap-2 xs:gap-4'>
               <Link
-                to='/login?mode=login'
+                to='/login-page'
                 className='inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-primary-600 bg-primary-100 hover:bg-primary-200 transition-colors'
               >
                 <LogIn className='h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
-                Login
+                Login Siswa
+              </Link>
+              <Link
+                to='/login?mode=login'
+                className='inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-secondary-600 bg-secondary-100 hover:bg-secondary-200 transition-colors'
+              >
+                <LogIn className='h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                Login Admin
               </Link>
               <Link
                 to='/login?mode=register'
@@ -80,11 +87,27 @@ const Welcome = () => {
           {/* Mobile-first CTA Buttons */}
           <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4'>
             <Link
-              to='/login?mode=login'
+              to='/halaman-siswa'
+              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-base sm:text-lg font-medium rounded-lg text-white bg-cyan-500 hover:bg-cyan-600 transition-colors shadow-lg hover:shadow-xl'
+            >
+              <LogIn className='h-4 w-4 sm:h-5 sm:w-5 mr-2' />
+              Halaman Siswa
+              <ArrowRight className='h-4 w-4 sm:h-5 sm:w-5 ml-2' />
+            </Link>
+            <Link
+              to='/halaman-guru'
               className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-base sm:text-lg font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl'
             >
               <LogIn className='h-4 w-4 sm:h-5 sm:w-5 mr-2' />
-              Sign In to Dashboard
+              Halaman Guru
+              <ArrowRight className='h-4 w-4 sm:h-5 sm:w-5 ml-2' />
+            </Link>
+            <Link
+              to='/login?mode=login'
+              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-primary-600 text-base sm:text-lg font-medium rounded-lg text-primary-600 bg-white hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl'
+            >
+              <LogIn className='h-4 w-4 sm:h-5 sm:w-5 mr-2' />
+              Admin Dashboard
               <ArrowRight className='h-4 w-4 sm:h-5 sm:w-5 ml-2' />
             </Link>
             <Link
