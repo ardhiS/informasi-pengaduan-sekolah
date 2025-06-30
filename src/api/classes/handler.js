@@ -5,6 +5,7 @@ class ClassesHandler {
 
     this.postClassHandler = this.postClassHandler.bind(this);
     this.getClassesHandler = this.getClassesHandler.bind(this);
+    this.getAllClassesHandler = this.getAllClassesHandler.bind(this);
     this.getClassByIdHandler = this.getClassByIdHandler.bind(this);
     this.putClassByIdHandler = this.putClassByIdHandler.bind(this);
     this.deleteClassByIdHandler = this.deleteClassByIdHandler.bind(this);
@@ -41,6 +42,17 @@ class ClassesHandler {
   async getClassesHandler(request) {
     const { userId } = request.auth.credentials;
     const classes = await this._service.getClasses(userId);
+
+    return {
+      status: 'success',
+      data: {
+        classes,
+      },
+    };
+  }
+
+  async getAllClassesHandler(request) {
+    const classes = await this._service.getAllClasses();
 
     return {
       status: 'success',

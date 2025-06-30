@@ -1,0 +1,152 @@
+{
+  "testUsers": {
+    "admin": {
+      "username": "admin01",
+      "password": "admin123",
+      "fullname": "System Administrator",
+      "role": "admin",
+      "description": "Full system access, user management, system configuration",
+      "badgeColor": "red-gradient",
+      "capabilities": [
+        "User management",
+        "System configuration",
+        "All reports and analytics",
+        "Manage classes and subjects",
+        "Override permissions"
+      ]
+    },
+    "teacher": {
+      "username": "teacher02",
+      "password": "teacher123",
+      "fullname": "Jane Smith",
+      "role": "teacher",
+      "description": "Educational management and class oversight",
+      "badgeColor": "blue-gradient",
+      "capabilities": [
+        "Manage assigned classes",
+        "Student information access",
+        "Subject management",
+        "Class reports",
+        "Academic calendar"
+      ]
+    },
+    "student": {
+      "username": "student01",
+      "password": "student123",
+      "fullname": "Alice Johnson",
+      "role": "student",
+      "description": "Learning access and personal academic information",
+      "badgeColor": "green-gradient",
+      "capabilities": [
+        "View academic information",
+        "Access class schedules",
+        "View grades",
+        "Submit assignments",
+        "View announcements"
+      ]
+    },
+    "staff": {
+      "username": "staff01",
+      "password": "staff123",
+      "fullname": "Bob Wilson",
+      "role": "staff",
+      "description": "Administrative support and data management",
+      "badgeColor": "purple-gradient",
+      "capabilities": [
+        "Administrative support",
+        "Data entry",
+        "Basic reports",
+        "Student registration",
+        "Event coordination"
+      ]
+    },
+    "principal": {
+      "username": "principal01",
+      "password": "principal123",
+      "fullname": "Dr. Sarah Davis",
+      "role": "principal",
+      "description": "Executive leadership and strategic oversight",
+      "badgeColor": "yellow-orange-gradient",
+      "capabilities": [
+        "High-level admin access",
+        "Strategic planning",
+        "Staff management",
+        "Budget allocation",
+        "Policy implementation"
+      ]
+    }
+  },
+  "sampleData": {
+    "classes": [
+      {
+        "name": "Math Grade 10A",
+        "description": "Advanced mathematics for grade 10 students"
+      },
+      {
+        "name": "Math Grade 10B",
+        "description": "Mathematics for grade 10 students"
+      },
+      {
+        "name": "Math Grade 11A",
+        "description": "Advanced mathematics for grade 11 students"
+      }
+    ],
+    "subjects": [
+      {
+        "name": "Mathematics",
+        "code": "MATH101",
+        "description": "Basic Mathematics"
+      },
+      {
+        "name": "Science",
+        "code": "SCI101",
+        "description": "General Science"
+      },
+      {
+        "name": "English",
+        "code": "ENG101",
+        "description": "English Language"
+      },
+      {
+        "name": "Physics",
+        "code": "PHY101",
+        "description": "Basic Physics"
+      },
+      {
+        "name": "Chemistry",
+        "code": "CHEM101",
+        "description": "Basic Chemistry"
+      }
+    ]
+  },
+  "demoFlow": {
+    "quickDemo": [
+      "Login as admin01 → Show full access",
+      "Navigate to Users → Show user management",
+      "Navigate to Classes → Show class management",
+      "Logout → Login as teacher02 → Show teacher view",
+      "Navigate to Classes → Show limited access",
+      "Logout → Login as student01 → Show student view"
+    ],
+    "headerDemo": [
+      "Login as different roles",
+      "Observe header changes",
+      "Notice role badge colors",
+      "See user name and role description"
+    ]
+  },
+  "urls": {
+    "frontend": "http://localhost:3000",
+    "backend": "http://localhost:5000",
+    "login": "http://localhost:3000/login",
+    "dashboard": "http://localhost:3000/dashboard",
+    "classes": "http://localhost:3000/classes",
+    "users": "http://localhost:3000/users",
+    "subjects": "http://localhost:3000/subjects"
+  },
+  "setupCommands": [
+    "node add-test-users.js",
+    "node add-simple-test-data.js",
+    "node create-sample-data.js"
+  ]
+}

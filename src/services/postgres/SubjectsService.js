@@ -25,14 +25,21 @@ class SubjectsService {
 
   async getSubjects() {
     const result = await this._pool.query(
-      'SELECT id, name, code, description FROM subjects'
+      'SELECT id, name, code, description, created_at, updated_at FROM subjects ORDER BY created_at DESC'
+    );
+    return result.rows;
+  }
+
+  async getAllSubjects() {
+    const result = await this._pool.query(
+      'SELECT id, name, code, description, created_at, updated_at FROM subjects ORDER BY created_at DESC'
     );
     return result.rows;
   }
 
   async getSubjectById(id) {
     const query = {
-      text: 'SELECT id, name, code, description FROM subjects WHERE id = $1',
+      text: 'SELECT id, name, code, description, created_at, updated_at FROM subjects WHERE id = $1',
       values: [id],
     };
     const result = await this._pool.query(query);

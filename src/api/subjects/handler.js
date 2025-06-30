@@ -5,6 +5,7 @@ class SubjectsHandler {
 
     this.postSubjectHandler = this.postSubjectHandler.bind(this);
     this.getSubjectsHandler = this.getSubjectsHandler.bind(this);
+    this.getAllSubjectsHandler = this.getAllSubjectsHandler.bind(this);
     this.getSubjectByIdHandler = this.getSubjectByIdHandler.bind(this);
     this.putSubjectByIdHandler = this.putSubjectByIdHandler.bind(this);
     this.deleteSubjectByIdHandler = this.deleteSubjectByIdHandler.bind(this);
@@ -33,6 +34,17 @@ class SubjectsHandler {
 
   async getSubjectsHandler() {
     const subjects = await this._service.getSubjects();
+    return {
+      status: 'success',
+      data: {
+        subjects,
+      },
+    };
+  }
+
+  async getAllSubjectsHandler(request) {
+    const subjects = await this._service.getAllSubjects();
+
     return {
       status: 'success',
       data: {

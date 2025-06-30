@@ -17,6 +17,11 @@ const routes = (handler) => [
   },
   {
     method: 'GET',
+    path: '/subjects/all',
+    handler: handler.getAllSubjectsHandler,
+  },
+  {
+    method: 'GET',
     path: '/subjects/{id}',
     handler: handler.getSubjectByIdHandler,
     options: {

@@ -28,14 +28,18 @@ class ClassesService {
 
   async getClasses(userId) {
     const query = {
-      text: `SELECT c.id, c.name, s.name as subject_name, u.username as teacher_name 
+      text: `SELECT c.id, c.name, c.description, c.subject_id, c.teacher_id,
+                    c.created_at, c.updated_at,
+                    s.name as subject_name, s.code as subject_code, 
+                    u.username as teacher_name, u.fullname as teacher_fullname
              FROM classes c 
              LEFT JOIN subjects s ON c.subject_id = s.id
              LEFT JOIN users u ON c.teacher_id = u.id
              WHERE c.teacher_id = $1 
              OR c.id IN (
                SELECT class_id FROM class_collaborators WHERE user_id = $1
-             )`,
+             )
+             ORDER BY c.created_at DESC`,
       values: [userId],
     };
     const result = await this._pool.query(query);
@@ -44,7 +48,9 @@ class ClassesService {
 
   async getClassById(id) {
     const query = {
-      text: `SELECT c.id, c.name, c.description, s.name as subject_name, s.code as subject_code, 
+      text: `SELECT c.id, c.name, c.description, c.subject_id, c.teacher_id,
+                    c.created_at, c.updated_at,
+                    s.name as subject_name, s.code as subject_code, 
                     u.username as teacher_name, u.fullname as teacher_fullname
              FROM classes c 
              LEFT JOIN subjects s ON c.subject_id = s.id
@@ -146,6 +152,21 @@ class ClassesService {
       targetType: 'student',
       targetName: 'Student enrollment',
     });
+  }
+
+  async getAllClasses() {
+    const query = {
+      text: `SELECT c.id, c.name, c.description, c.subject_id, c.teacher_id,
+                    c.created_at, c.updated_at,
+                    s.name as subject_name, s.code as subject_code, 
+                    u.username as teacher_name, u.fullname as teacher_fullname
+             FROM classes c 
+             LEFT JOIN subjects s ON c.subject_id = s.id
+             LEFT JOIN users u ON c.teacher_id = u.id
+             ORDER BY c.created_at DESC`,
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 }
 

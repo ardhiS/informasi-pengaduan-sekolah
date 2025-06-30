@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles for mobile-first */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-sans antialiased;
+  }
+
+  /* Prevent horizontal scroll on mobile */
+  html,
+  body {
+    @apply overflow-x-hidden;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  /* Button variants with mobile-first approach */
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-medium py-2.5 px-4 xs:px-6 rounded-lg transition-all duration-200 touch-manipulation focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm xs:text-base;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-800 font-medium py-2.5 px-4 xs:px-6 rounded-lg transition-all duration-200 touch-manipulation focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm xs:text-base;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium py-2.5 px-4 xs:px-6 rounded-lg transition-all duration-200 touch-manipulation focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm xs:text-base;
+  }
+
+  .btn-icon {
+    @apply flex items-center justify-center p-2 xs:p-2.5 rounded-lg transition-all duration-200 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  /* Card with mobile-optimized spacing */
+  .card {
+    @apply bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200;
+  }
+
+  /* Form controls with better mobile touch targets */
+  .input-field {
+    @apply block w-full px-3 py-3 xs:py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base xs:text-sm touch-manipulation;
+  }
+
+  .label {
+    @apply block text-sm xs:text-base font-medium text-gray-700 mb-1;
+  }
+
+  .select-field {
+    @apply block w-full px-3 py-3 xs:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base xs:text-sm touch-manipulation bg-white;
+  }
+
+  /* Mobile-friendly table */
+  .table-responsive {
+    @apply overflow-x-auto -mx-4 xs:mx-0;
+  }
+
+  .table-responsive table {
+    @apply min-w-full text-sm xs:text-base;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    @apply animate-spin rounded-full h-8 w-8 xs:h-12 xs:w-12 border-b-2 border-primary-600;
+  }
+
+  /* Alert components */
+  .alert {
+    @apply rounded-md p-3 xs:p-4 text-sm xs:text-base;
+  }
+
+  .alert-error {
+    @apply bg-red-50 text-red-800 border border-red-200;
+  }
+
+  .alert-success {
+    @apply bg-green-50 text-green-800 border border-green-200;
+  }
+
+  .alert-warning {
+    @apply bg-yellow-50 text-yellow-800 border border-yellow-200;
+  }
+
+  .alert-info {
+    @apply bg-blue-50 text-blue-800 border border-blue-200;
+  }
+}
+
+/* Utility classes for mobile optimization */
+@layer utilities {
+  .touch-pan-x {
+    touch-action: pan-x;
+  }
+
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* Safe area for mobile devices with notches */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Better mobile scrolling */
+  .scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Mobile-optimized text sizes */
+  .text-mobile-sm {
+    @apply text-sm xs:text-base;
+  }
+
+  .text-mobile-base {
+    @apply text-base xs:text-lg;
+  }
+
+  .text-mobile-lg {
+    @apply text-lg xs:text-xl;
+  }
+
+  .text-mobile-xl {
+    @apply text-xl xs:text-2xl;
+  }
+
+  .text-mobile-2xl {
+    @apply text-2xl xs:text-3xl;
+  }
+}

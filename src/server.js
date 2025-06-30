@@ -12,13 +12,20 @@ const siswa = require('./api/siswa');
 const SiswaService = require('./services/postgres/siswa/SiswaService');
 const SiswaValidator = require('./validator/siswa');
 
+const complaints = require('./api/complaints');
+const ComplaintsService = require('./services/postgres/complaints/ComplaintsService');
+const ComplaintsValidator = require('./validator/complaints');
+
 // Import authentication modules
 const auth = require('./api/auth');
 const authentications = require('./api/authentications');
+const users = require('./api/users');
 const AuthService = require('./services/postgres/AuthService');
 const RefreshTokenService = require('./services/postgres/RefreshTokenService');
+const UsersService = require('./services/postgres/UsersService');
 const AuthValidator = require('./validator/auth');
 const AuthenticationsValidator = require('./validator/authentications');
+const UsersValidator = require('./validator/users');
 
 // Import new modules for OpenMusic-like features
 const subjects = require('./api/subjects');
@@ -41,8 +48,10 @@ const AuthorizationError = require('./exceptions/AuthorizationError');
 const init = async () => {
   const guruService = new GuruService();
   const siswaService = new SiswaService();
+  const complaintsService = new ComplaintsService();
   const authService = new AuthService();
   const refreshTokenService = new RefreshTokenService();
+  const usersService = new UsersService();
   const subjectsService = new SubjectsService();
   const activitiesService = new ActivitiesService();
   const collaborationsService = new CollaborationsService();
@@ -117,6 +126,13 @@ const init = async () => {
       },
     },
     {
+      plugin: users,
+      options: {
+        service: usersService,
+        validator: UsersValidator,
+      },
+    },
+    {
       plugin: subjects,
       options: {
         service: subjectsService,
@@ -150,6 +166,13 @@ const init = async () => {
       options: {
         service: new SiswaService(),
         validator: SiswaValidator,
+      },
+    },
+    {
+      plugin: complaints,
+      options: {
+        service: complaintsService,
+        validator: ComplaintsValidator,
       },
     },
   ]);

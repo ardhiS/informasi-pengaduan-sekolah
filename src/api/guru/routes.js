@@ -3,41 +3,26 @@ const routes = (handler) => [
     method: 'POST',
     path: '/guru',
     handler: handler.postGuruHandler,
-    options: {
-      auth: 'school_jwt',
-    },
   },
   {
     method: 'GET',
     path: '/guru/{id}',
     handler: handler.getGuruByIdHandler,
-    options: {
-      auth: 'school_jwt',
-    },
   },
   {
     method: 'GET',
     path: '/guru',
     handler: handler.getAllGuruHandler,
-    options: {
-      auth: 'school_jwt',
-    },
   },
   {
     method: 'PUT',
     path: '/guru/{id}',
     handler: handler.putGuruByIdHandler,
-    options: {
-      auth: 'school_jwt',
-    },
   },
   {
     method: 'DELETE',
     path: '/guru/{id}',
     handler: handler.deleteGuruByIdHandler,
-    options: {
-      auth: 'school_jwt',
-    },
   },
 ];
 

@@ -51,11 +51,16 @@ class AuthService {
     }
 
     // Generate JWT tokens dengan environment variables
-    const accessToken = jwt.sign(
-      { userId: user.id },
-      process.env.ACCESS_TOKEN_KEY,
-      { expiresIn: '30m' }
-    );
+    const tokenPayload = {
+      userId: user.id,
+      username: user.username,
+      fullname: user.fullname,
+      role: user.role,
+    };
+
+    const accessToken = jwt.sign(tokenPayload, process.env.ACCESS_TOKEN_KEY, {
+      expiresIn: '30m',
+    });
 
     const refreshToken = jwt.sign(
       { userId: user.id },

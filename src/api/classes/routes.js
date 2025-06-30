@@ -17,6 +17,11 @@ const routes = (handler) => [
   },
   {
     method: 'GET',
+    path: '/classes/all',
+    handler: handler.getAllClassesHandler,
+  },
+  {
+    method: 'GET',
     path: '/classes/{id}',
     handler: handler.getClassByIdHandler,
     options: {
