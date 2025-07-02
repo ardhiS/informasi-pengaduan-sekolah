@@ -40,6 +40,8 @@ const collaborations = require('./api/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsService');
 const ActivitiesService = require('./services/postgres/ActivitiesService');
 
+const sampleDataRoutes = require('./api/sample-data/routes');
+
 const ClientError = require('./exceptions/ClientError');
 const NotFoundError = require('./exceptions/NotFoudError');
 const AuthenticationError = require('./exceptions/AuthenticationError');
@@ -90,8 +92,9 @@ const init = async () => {
         return {
           isValid: true,
           credentials: {
-            userId: user.id,
+            userId: user.userId,
             username: user.username,
+            fullname: user.fullname,
             role: user.role,
           },
         };
@@ -176,6 +179,9 @@ const init = async () => {
       },
     },
   ]);
+
+  // Register sample data routes
+  server.route(sampleDataRoutes);
 
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;

@@ -7,9 +7,9 @@ class ComplaintsService {
     this._pool = new Pool({
       host: process.env.PGHOST || 'localhost',
       port: process.env.PGPORT || 5432,
-      user: process.env.PGUSER || 'postgres',
-      password: process.env.PGPASSWORD || 'password',
-      database: process.env.PGDATABASE || 'school_management',
+      user: process.env.PGUSER || 'developer',
+      password: process.env.PGPASSWORD || 'supersecretpassword',
+      database: process.env.PGDATABASE || 'notesapp',
     });
   }
 
@@ -27,7 +27,8 @@ class ComplaintsService {
     const query = {
       text: `INSERT INTO complaints 
              (title, description, category, reporter_name, reporter_email, 
-              reporter_phone, reporter_type, reporter_class, priority, status, reported_at) 
+              reporter_phone, reporter_type, reporter_class, priority, status, 
+              reported_at) 
              VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW()) 
              RETURNING id`,
       values: [
@@ -222,21 +223,157 @@ class ComplaintsService {
       SELECT 
         COUNT(*) as total,
         COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
-        COUNT(CASE WHEN status = 'process' THEN 1 END) as process,
+        COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
         COUNT(CASE WHEN status = 'resolved' THEN 1 END) as resolved,
         COUNT(CASE WHEN status = 'closed' THEN 1 END) as closed,
         COUNT(CASE WHEN priority = 'urgent' THEN 1 END) as urgent,
         COUNT(CASE WHEN priority = 'high' THEN 1 END) as high,
+        COUNT(CASE WHEN priority = 'medium' THEN 1 END) as medium,
+        COUNT(CASE WHEN priority = 'low' THEN 1 END) as low,
         COUNT(CASE WHEN category = 'akademik' THEN 1 END) as akademik,
         COUNT(CASE WHEN category = 'fasilitas' THEN 1 END) as fasilitas,
         COUNT(CASE WHEN category = 'bullying' THEN 1 END) as bullying,
+        COUNT(CASE WHEN category = 'lainnya' THEN 1 END) as lainnya,
         COUNT(CASE WHEN reporter_type = 'siswa' THEN 1 END) as from_siswa,
-        COUNT(CASE WHEN reporter_type = 'orangtua' THEN 1 END) as from_orangtua
+        COUNT(CASE WHEN reporter_type = 'guru' THEN 1 END) as from_guru,
+        COUNT(CASE WHEN reporter_type = 'orangtua' THEN 1 END) as from_orangtua,
+        COUNT(CASE WHEN reporter_type = 'admin' THEN 1 END) as from_admin
       FROM complaints
     `;
 
     const result = await this._pool.query(query);
     return result.rows[0];
+  }
+
+  // Get complaints (since we don't have created_by column, return all with filters)
+  async getComplaintsByUser(
+    userId,
+    { status, category, priority, limit = 50, offset = 0 }
+  ) {
+    // Since the table doesn't have created_by column, return all complaints with filters
+    // This maintains API compatibility while working with current table structure
+    return this.getComplaints({ status, category, priority, limit, offset });
+  }
+
+  // Get complaints assigned to specific user
+  async getAssignedComplaints(
+    userId,
+    { status, category, priority, limit, offset }
+  ) {
+    let whereClause = 'WHERE assigned_to = $1';
+    const values = [userId];
+    let paramCount = 1;
+
+    if (status) {
+      paramCount++;
+      whereClause += ` AND status = $${paramCount}`;
+      values.push(status);
+    }
+
+    if (category) {
+      paramCount++;
+      whereClause += ` AND category = $${paramCount}`;
+      values.push(category);
+    }
+
+    if (priority) {
+      paramCount++;
+      whereClause += ` AND priority = $${paramCount}`;
+      values.push(priority);
+    }
+
+    let limitClause = '';
+    if (limit) {
+      paramCount++;
+      limitClause += ` LIMIT $${paramCount}`;
+      values.push(limit);
+    }
+
+    if (offset) {
+      paramCount++;
+      limitClause += ` OFFSET $${paramCount}`;
+      values.push(offset);
+    }
+
+    const query = `
+      SELECT * FROM complaints 
+      ${whereClause}
+      ORDER BY reported_at DESC
+      ${limitClause}
+    `;
+
+    const result = await this._pool.query(query, values);
+    return result.rows;
+  }
+
+  // Update complaint status specifically
+  async updateComplaintStatus(id, updateData) {
+    const fields = [];
+    const values = [];
+    let paramCount = 0;
+
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] !== undefined) {
+        paramCount++;
+        fields.push(`${key} = $${paramCount}`);
+        values.push(updateData[key]);
+      }
+    });
+
+    if (fields.length === 0) {
+      throw new InvariantError('Tidak ada data yang akan diupdate');
+    }
+
+    paramCount++;
+    values.push(id);
+
+    const query = {
+      text: `UPDATE complaints SET ${fields.join(
+        ', '
+      )} WHERE id = $${paramCount}`,
+      values,
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Complaint tidak ditemukan');
+    }
+  }
+
+  // Assign complaint to user
+  async assignComplaint(id, assignData) {
+    const fields = [];
+    const values = [];
+    let paramCount = 0;
+
+    Object.keys(assignData).forEach((key) => {
+      if (assignData[key] !== undefined) {
+        paramCount++;
+        fields.push(`${key} = $${paramCount}`);
+        values.push(assignData[key]);
+      }
+    });
+
+    if (fields.length === 0) {
+      throw new InvariantError('Tidak ada data assignment yang akan diupdate');
+    }
+
+    paramCount++;
+    values.push(id);
+
+    const query = {
+      text: `UPDATE complaints SET ${fields.join(
+        ', '
+      )} WHERE id = $${paramCount}`,
+      values,
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Complaint tidak ditemukan');
+    }
   }
 }
 

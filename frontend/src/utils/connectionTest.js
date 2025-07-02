@@ -1,7 +1,7 @@
 // Test script untuk verifikasi koneksi frontend-backend
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://095984n-5000.asse.devtunnels.ms';
 
 export const testBackendConnection = async () => {
   const results = {

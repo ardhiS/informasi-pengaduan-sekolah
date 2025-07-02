@@ -92,6 +92,28 @@ Login user dan mendapatkan access & refresh token.
 }
 ```
 
+**Example Requests:**
+
+```json
+// Login sebagai Siswa
+{
+  "username": "siswa01",
+  "password": "siswa123"
+}
+
+// Login sebagai Guru
+{
+  "username": "guru01",
+  "password": "guru123"
+}
+
+// Login sebagai Admin
+{
+  "username": "admin01",
+  "password": "admin123"
+}
+```
+
 **Response Success (200):**
 
 ```json
@@ -113,6 +135,12 @@ Login user dan mendapatkan access & refresh token.
   "message": "Kredensial yang Anda berikan salah"
 }
 ```
+
+**⚠️ Important Notes:**
+
+- Use **exact** test credentials above
+- Role in JWT token must match backend expectations
+- For students, use `siswa01` (role: `siswa`) NOT `student01` (role: `student`)
 
 ---
 
@@ -261,7 +289,121 @@ Menghapus refresh token dari database.
 
 ---
 
-### 📚 Subjects (Mata Pelajaran) Endpoints
+### � Complaints (Pengaduan) Endpoints
+
+#### 1. Get All Complaints
+
+Mendapatkan daftar complaints berdasarkan role user.
+
+**Endpoint:** `GET /complaints`  
+**Authentication:** Required
+
+**Query Parameters:**
+
+```
+status: string (optional) - pending, in_progress, resolved, closed
+category: string (optional) - akademik, fasilitas, bullying, lainnya
+priority: string (optional) - low, medium, high, urgent
+limit: number (optional) - default 50
+offset: number (optional) - default 0
+```
+
+**Role-based Access:**
+
+- **Admin:** Can view all complaints
+- **Guru:** Can view all complaints
+- **Siswa:** Can only view own complaints
+
+**Response Success (200):**
+
+```json
+{
+  "status": "success",
+  "data": {
+    "complaints": [
+      {
+        "id": "complaint-xxxxx",
+        "title": "Masalah AC Kelas",
+        "description": "AC di kelas tidak berfungsi",
+        "status": "pending",
+        "priority": "medium",
+        "category": "fasilitas",
+        "reporter_id": "user-xxxxx",
+        "reporter_type": "siswa",
+        "created_at": "2025-07-01T10:30:00.000Z",
+        "updated_at": "2025-07-01T10:30:00.000Z"
+      }
+    ],
+    "user_info": {
+      "role": "siswa",
+      "can_create": true,
+      "can_view_all": false,
+      "can_update": false,
+      "can_delete": false
+    }
+  }
+}
+```
+
+#### 2. Get Complaint Statistics
+
+Mendapatkan statistik complaints berdasarkan role user.
+
+**Endpoint:** `GET /complaints/stats`  
+**Authentication:** Required
+
+**Role-based Statistics:**
+
+- **Admin/Guru:** Get global statistics
+- **Siswa:** Get statistics for own complaints only
+
+**Response Success (200):**
+
+```json
+{
+  "status": "success",
+  "data": {
+    "stats": {
+      "total": "5",
+      "pending": "2",
+      "in_progress": "1",
+      "resolved": "2",
+      "closed": "0",
+      "urgent": "0",
+      "high": "1",
+      "medium": "3",
+      "low": "1",
+      "akademik": "2",
+      "fasilitas": "2",
+      "bullying": "0",
+      "lainnya": "1",
+      "from_siswa": "3",
+      "from_guru": "1",
+      "from_orangtua": "1",
+      "from_admin": "0",
+      "user_permissions": {
+        "role": "siswa",
+        "can_create": true,
+        "can_view_all": false,
+        "can_update": false,
+        "can_delete": false,
+        "can_assign": false
+      }
+    }
+  }
+}
+```
+
+**⚠️ Common 403 Error:**
+If you get 403 Forbidden error, check:
+
+1. You're using correct role (`siswa`, not `student`)
+2. JWT token is valid and not expired
+3. You're logged in with correct test credentials
+
+---
+
+### �📚 Subjects (Mata Pelajaran) Endpoints
 
 #### 1. Create Subject
 
@@ -861,6 +1003,97 @@ Menghapus kolaborator dari kelas.
 
 ---
 
+## 🚨 CRITICAL: User Role Authentication Issues
+
+### ⚠️ Role Confusion Issue
+
+**PROBLEM DISCOVERED:** Ada confusion antara role `student` dan `siswa` yang menyebabkan 403 errors.
+
+#### Valid Roles di Backend:
+
+- ✅ `admin` - Administrator sistem
+- ✅ `guru` - Teacher/Instructor
+- ✅ `siswa` - Student (Indonesian)
+- ❌ `student` - **NOT SUPPORTED** (English version)
+
+#### Test Users yang Valid:
+
+```json
+// Guru Test User
+{
+  "username": "guru01",
+  "password": "guru123",
+  "role": "guru"
+}
+
+// Siswa Test User
+{
+  "username": "siswa01",
+  "password": "siswa123",
+  "role": "siswa"  // MUST be "siswa", NOT "student"
+}
+
+// Admin Test User
+{
+  "username": "admin01",
+  "password": "admin123",
+  "role": "admin"
+}
+```
+
+#### 🔧 Troubleshooting 403 Errors:
+
+**Symptoms:**
+
+```
+Failed to load resource: the server responded with a status of 403 (Forbidden)
+:5000/complaints/stats:1
+:5000/complaints?limit=100:1
+```
+
+**Root Cause:**
+
+- User logged in with wrong role (`student` instead of `siswa`)
+- Backend doesn't recognize `student` role
+- JWT token contains invalid role
+
+**Solution:**
+
+1. **Clear browser storage:**
+
+   ```javascript
+   localStorage.clear();
+   sessionStorage.clear();
+   ```
+
+2. **Login with correct credentials:**
+
+   - For students: `siswa01` / `siswa123` (role: `siswa`)
+   - For teachers: `guru01` / `guru123` (role: `guru`)
+
+3. **Verify JWT token:**
+   ```javascript
+   // In browser console:
+   const token = localStorage.getItem('accessToken');
+   const payload = JSON.parse(atob(token.split('.')[1]));
+   console.log('Role:', payload.role); // Should be 'siswa', NOT 'student'
+   ```
+
+#### JWT Token Structure:
+
+```json
+{
+  "userId": "user-xxxxx",
+  "username": "siswa01",
+  "fullname": "Test Siswa User",
+  "role": "siswa", // CRITICAL: Must be 'siswa'
+  "iat": 1751369106,
+  "exp": 1751370906
+}
+```
+
+---
+
 ## 🗄️ Database Schema
 
 ### Users Table
@@ -1086,3 +1319,62 @@ Untuk pertanyaan dan dukungan teknis, silakan merujuk ke:
 **Status: ✅ Production Ready**  
 **Last Updated**: December 30, 2025  
 **API Version**: 1.0.0
+
+---
+
+## 🎯 Quick Troubleshooting Guide
+
+### 403 Forbidden Errors
+
+**Problem:** `Failed to load resource: the server responded with a status of 403 (Forbidden)`
+
+**Common Causes:**
+
+1. **Wrong Role:** Using `student` instead of `siswa`
+2. **Expired Token:** JWT token has expired
+3. **Invalid Credentials:** Wrong username/password combination
+
+**Solution Steps:**
+
+```javascript
+// 1. Clear browser storage
+localStorage.clear();
+sessionStorage.clear();
+
+// 2. Login with correct credentials
+// For students: siswa01/siswa123
+// For teachers: guru01/guru123
+// For admin: admin01/admin123
+
+// 3. Verify token
+const token = localStorage.getItem('accessToken');
+const payload = JSON.parse(atob(token.split('.')[1]));
+console.log('Role:', payload.role); // Must be 'siswa', 'guru', or 'admin'
+```
+
+### Test Environment
+
+**Backend Server:** `http://localhost:5000`
+**Frontend Server:** `http://localhost:3000`
+
+**Valid Test Users:**
+
+- `siswa01` / `siswa123` (role: siswa)
+- `guru01` / `guru123` (role: guru)
+- `admin01` / `admin123` (role: admin)
+
+### Role Permissions Matrix
+
+| Endpoint              | Admin     | Guru       | Siswa       |
+| --------------------- | --------- | ---------- | ----------- |
+| GET /complaints       | ✅ All    | ✅ All     | ✅ Own only |
+| GET /complaints/stats | ✅ Global | ✅ Global  | ✅ Own only |
+| POST /complaints      | ✅ Yes    | ✅ Yes     | ✅ Yes      |
+| PUT /complaints       | ✅ Yes    | ✅ Limited | ❌ No       |
+| DELETE /complaints    | ✅ Yes    | ❌ No      | ❌ No       |
+
+---
+
+**Last Updated:** July 1, 2025  
+**Version:** 1.2.0  
+**Critical Fix:** Role authentication issue resolved

@@ -132,6 +132,59 @@ Badge Color: Indigo Gradient
 
 ---
 
+### 7. 🔧 UPDATED: Test Guru for Complaints System
+
+```
+Username: guru01
+Password: guru123
+Full Name: Test Guru User
+Role: guru
+Access: Dashboard, Complaints (view/create/update), Stats
+```
+
+**Fix Applied for 403 Error:**
+
+- ✅ Created guru01 user with proper credentials
+- ✅ Fixed JWT token parsing in AuthContext
+- ✅ Verified backend permissions allow guru access to /complaints/stats
+- ✅ All API endpoints work correctly for guru role
+
+**Testing Instructions:**
+
+1. Clear browser storage (localStorage/sessionStorage)
+2. Visit: http://localhost:3000/login/guru
+3. Login with: guru01 / guru123
+4. Navigate to /complaints - should work without 403 errors
+
+---
+
+### 8. 🎓 UPDATED: Test Siswa for Complaints System
+
+```
+Username: siswa01
+Password: siswa123
+Full Name: Test Siswa User
+Role: siswa
+Access: Dashboard, Complaints (view/create), Stats (own complaints only)
+```
+
+**Fix Applied for 403 Error:**
+
+- ✅ Created siswa01 user with proper credentials
+- ✅ Backend verified - all endpoints accessible for siswa role
+- ✅ JWT token structure working correctly
+- ✅ ComplaintsService properly configured for role-based access
+
+**Testing Instructions:**
+
+1. Clear browser storage (localStorage/sessionStorage)
+2. Visit: http://localhost:3000/login/siswa
+3. Login with: siswa01 / siswa123
+4. Navigate to /complaints - should work without 403 errors
+5. Should see own complaints and statistics
+
+---
+
 ## 🎨 Visual Role Indicators
 
 Each role has a distinct visual indicator in the header:

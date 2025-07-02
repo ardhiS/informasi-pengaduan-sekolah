@@ -77,9 +77,9 @@ export const classesService = {
 };
 
 export const usersService = {
-  // GET /users
+  // GET /users/all (public endpoint for all users)
   getAll: async () => {
-    const response = await api.get('/users');
+    const response = await api.get('/users/all');
     return response.data;
   },
 
@@ -92,6 +92,54 @@ export const usersService = {
   // PUT /users/{id}
   update: async (id, userData) => {
     const response = await api.put(`/users/${id}`, userData);
+    return response.data;
+  },
+};
+
+export const complaintsService = {
+  // GET /complaints/all (public endpoint for all complaints)
+  getAll: async () => {
+    try {
+      const response = await api.get('/complaints/all');
+      return response.data;
+    } catch (error) {
+      // If endpoint doesn't exist or returns error, return empty array
+      console.warn(
+        'Complaints endpoint not available or failed:',
+        error.message
+      );
+      return {
+        data: {
+          complaints: [],
+        },
+        complaints: [],
+        success: false,
+        message: 'Complaints endpoint not available',
+      };
+    }
+  },
+
+  // GET /complaints/{id}
+  getById: async (id) => {
+    const response = await api.get(`/complaints/${id}`);
+    return response.data;
+  },
+
+  // POST /complaints
+  create: async (complaintData) => {
+    const response = await api.post('/complaints', complaintData);
+    return response.data;
+  },
+
+  // PUT /complaints/{id}
+  update: async (id, complaintData) => {
+    const response = await api.put(`/complaints/${id}`, complaintData);
+    return response.data;
+  },
+
+  // DELETE /complaints/{id}
+  delete: async (id) => {
+    const response = await api.delete(`/complaints/${id}`);
     return response.data;
   },
 };

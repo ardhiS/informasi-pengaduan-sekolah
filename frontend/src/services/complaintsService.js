@@ -1,48 +1,30 @@
-import axios from 'axios';
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Add request interceptor untuk authentication
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor untuk error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+import api from './api'; // Gunakan API instance yang sudah dikonfigurasi
 
 class ComplaintsService {
   // Create new complaint
   async create(complaintData) {
     try {
-      const response = await api.post('/complaints', complaintData);
+      // Filter out fields that are not allowed for new complaints
+      const allowedFields = [
+        'title',
+        'description',
+        'category',
+        'priority',
+        'reporter_name',
+        'reporter_email',
+        'reporter_phone',
+        'reporter_type',
+        'reporter_class',
+      ];
+
+      const filteredData = {};
+      allowedFields.forEach((field) => {
+        if (complaintData[field] !== undefined && complaintData[field] !== '') {
+          filteredData[field] = complaintData[field];
+        }
+      });
+
+      const response = await api.post('/complaints', filteredData);
       return response.data;
     } catch (error) {
       console.error('Error creating complaint:', error);
@@ -83,7 +65,26 @@ class ComplaintsService {
   // Update complaint
   async update(id, complaintData) {
     try {
-      const response = await api.put(`/complaints/${id}`, complaintData);
+      // Filter out fields that are not allowed for updating complaints
+      const allowedFields = [
+        'title',
+        'description',
+        'category',
+        'status',
+        'priority',
+        'assigned_to',
+        'admin_notes',
+        'resolution',
+      ];
+
+      const filteredData = {};
+      allowedFields.forEach((field) => {
+        if (complaintData[field] !== undefined) {
+          filteredData[field] = complaintData[field];
+        }
+      });
+
+      const response = await api.put(`/complaints/${id}`, filteredData);
       return response.data;
     } catch (error) {
       console.error('Error updating complaint:', error);

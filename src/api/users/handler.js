@@ -5,6 +5,7 @@ class UsersHandler {
 
     this.postUserHandler = this.postUserHandler.bind(this);
     this.getUsersHandler = this.getUsersHandler.bind(this);
+    this.getAllUsersHandler = this.getAllUsersHandler.bind(this);
     this.getUserByIdHandler = this.getUserByIdHandler.bind(this);
     this.putUserByIdHandler = this.putUserByIdHandler.bind(this);
     this.deleteUserByIdHandler = this.deleteUserByIdHandler.bind(this);
@@ -33,6 +34,16 @@ class UsersHandler {
   }
 
   async getUsersHandler() {
+    const users = await this._service.getUsers();
+    return {
+      status: 'success',
+      data: {
+        users,
+      },
+    };
+  }
+
+  async getAllUsersHandler() {
     const users = await this._service.getUsers();
     return {
       status: 'success',

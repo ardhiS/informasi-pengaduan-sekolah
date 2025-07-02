@@ -15,6 +15,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { subjectsService } from '../services/dataService';
+import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../utils/translations';
 
 // Helper function to format date
 const formatDateTime = (dateString) => {
@@ -27,6 +29,8 @@ const formatDateTime = (dateString) => {
 };
 
 const Subjects = () => {
+  const { isDarkMode, language } = useTheme();
+  const { t } = useTranslation(language);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -158,15 +162,19 @@ const Subjects = () => {
     <div className='space-y-4 xs:space-y-6'>
       {/* Header */}
       <div className='flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3'>
-        <h1 className='text-mobile-2xl font-bold text-gray-900'>
-          Subjects Management
+        <h1
+          className={`text-mobile-2xl font-bold ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}
+        >
+          {t('subjects.title')}
         </h1>
         <button
           onClick={() => setShowModal(true)}
           className='btn-primary flex items-center space-x-2 self-start xs:self-auto'
         >
           <Plus className='h-4 w-4 xs:h-5 xs:w-5' />
-          <span>Add Subject</span>
+          <span>{t('subjects.addSubject')}</span>
         </button>
       </div>
 
@@ -176,10 +184,12 @@ const Subjects = () => {
           <div className='flex items-start'>
             <AlertCircle className='h-5 w-5 mt-0.5 flex-shrink-0' />
             <div className='ml-3 min-w-0 flex-1'>
-              <div className='font-medium'>Error Loading Subjects</div>
+              <div className='font-medium'>
+                {t('subjects.errorLoadingSubjects')}
+              </div>
               <div className='mt-1'>{error}</div>
               <div className='text-2xs xs:text-xs mt-2 opacity-75'>
-                Make sure backend server is running on http://localhost:5000
+                {t('subjects.backendServerNote')}
               </div>
             </div>
           </div>
@@ -198,10 +208,14 @@ const Subjects = () => {
       {/* Search */}
       <div className='flex items-center gap-3 xs:gap-4'>
         <div className='relative flex-1'>
-          <Search className='absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 xs:h-5 xs:w-5 text-gray-400 transition-colors group-focus-within:text-primary-500' />
+          <Search
+            className={`absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 xs:h-5 xs:w-5 ${
+              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+            } transition-colors group-focus-within:text-primary-500`}
+          />
           <input
             type='text'
-            placeholder='Search subjects...'
+            placeholder={t('subjects.searchSubjects')}
             className='input-field pl-10 xs:pl-12'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -209,7 +223,11 @@ const Subjects = () => {
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg'
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                isDarkMode
+                  ? 'text-gray-500 hover:text-gray-300'
+                  : 'text-gray-400 hover:text-gray-600'
+              } text-lg`}
             >
               ×
             </button>
@@ -217,7 +235,11 @@ const Subjects = () => {
         </div>
         <button
           onClick={fetchSubjects}
-          className='btn-icon text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+          className={`btn-icon ${
+            isDarkMode
+              ? 'text-gray-400 hover:text-primary-400 hover:bg-primary-900/20'
+              : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+          }`}
           disabled={loading}
         >
           <RefreshCw
@@ -242,13 +264,25 @@ const Subjects = () => {
                     </div>
                   </div>
                   <div className='flex-1 min-w-0'>
-                    <h3 className='text-mobile-lg font-medium text-gray-900 truncate'>
+                    <h3
+                      className={`text-mobile-lg font-medium ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      } truncate`}
+                    >
                       {subject.name}
                     </h3>
                     {subject.code && (
                       <div className='flex items-center mt-1'>
-                        <Code className='h-3 w-3 xs:h-4 xs:w-4 mr-1.5 text-gray-400 flex-shrink-0' />
-                        <span className='text-mobile-sm text-gray-500 truncate'>
+                        <Code
+                          className={`h-3 w-3 xs:h-4 xs:w-4 mr-1.5 ${
+                            isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                          } flex-shrink-0`}
+                        />
+                        <span
+                          className={`text-mobile-sm ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          } truncate`}
+                        >
                           {subject.code}
                         </span>
                       </div>
@@ -258,29 +292,49 @@ const Subjects = () => {
                 <div className='flex space-x-1 ml-2'>
                   <button
                     onClick={() => handleEdit(subject)}
-                    className='btn-icon text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+                    className={`btn-icon ${
+                      isDarkMode
+                        ? 'text-gray-400 hover:text-primary-400 hover:bg-primary-900/20'
+                        : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+                    }`}
                   >
                     <Edit className='h-4 w-4' />
                   </button>
                   <button
                     onClick={() => handleDelete(subject.id)}
-                    className='btn-icon text-gray-500 hover:text-red-600 hover:bg-red-50'
+                    className={`btn-icon ${
+                      isDarkMode
+                        ? 'text-gray-400 hover:text-red-400 hover:bg-red-900/20'
+                        : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+                    }`}
                   >
                     <Trash2 className='h-4 w-4' />
                   </button>
                 </div>
               </div>
 
-              <p className='text-mobile-sm text-gray-600 mb-3 line-clamp-2'>
-                {subject.description || 'No description available'}
+              <p
+                className={`text-mobile-sm ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                } mb-3 line-clamp-2`}
+              >
+                {subject.description || t('subjects.noDescription')}
               </p>
 
-              <div className='pt-3 border-t border-gray-100'>
-                <div className='text-2xs xs:text-xs text-gray-500 space-y-1'>
+              <div
+                className={`pt-3 border-t ${
+                  isDarkMode ? 'border-gray-700' : 'border-gray-100'
+                }`}
+              >
+                <div
+                  className={`text-2xs xs:text-xs ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  } space-y-1`}
+                >
                   <div className='flex items-center'>
                     <Calendar className='h-3 w-3 mr-1.5 flex-shrink-0' />
                     <span className='truncate'>
-                      Created:{' '}
+                      {t('subjects.created')}:{' '}
                       {formatDateTime(subject.created_at || subject.createdAt)}
                     </span>
                   </div>
@@ -289,7 +343,8 @@ const Subjects = () => {
                       <div className='flex items-center'>
                         <Calendar className='h-3 w-3 mr-1.5 flex-shrink-0' />
                         <span className='truncate'>
-                          Updated: {formatDateTime(subject.updated_at)}
+                          {t('subjects.updated')}:{' '}
+                          {formatDateTime(subject.updated_at)}
                         </span>
                       </div>
                     )}
@@ -303,61 +358,106 @@ const Subjects = () => {
       {/* Subjects Table - Desktop */}
       <div className='hidden lg:block card overflow-hidden'>
         <div className='table-responsive'>
-          <table className='min-w-full divide-y divide-gray-200'>
-            <thead className='bg-gray-50'>
+          <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
+            <thead className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
               <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Subject
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                  } uppercase tracking-wider`}
+                >
+                  {t('subjects.subject')}
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Description
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                  } uppercase tracking-wider`}
+                >
+                  {t('subjects.description')}
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Created
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                  } uppercase tracking-wider`}
+                >
+                  {t('subjects.created')}
                 </th>
-                <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Actions
+                <th
+                  className={`px-6 py-3 text-right text-xs font-medium ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                  } uppercase tracking-wider`}
+                >
+                  {t('common.actions')}
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-white divide-y divide-gray-200'>
+            <tbody
+              className={`${
+                isDarkMode
+                  ? 'bg-gray-900 divide-gray-700'
+                  : 'bg-white divide-gray-200'
+              } divide-y`}
+            >
               {currentSubjects.map((subject) => (
                 <tr
                   key={subject.id}
-                  className='hover:bg-gray-50 transition-colors duration-150'
+                  className={`${
+                    isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
+                  } transition-colors duration-150`}
                 >
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='flex items-center'>
                       <BookOpen className='h-8 w-8 text-primary-600 mr-3' />
                       <div>
-                        <div className='text-sm font-medium text-gray-900'>
+                        <div
+                          className={`text-sm font-medium ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                          }`}
+                        >
                           {subject.name}
                         </div>
                         {subject.code && (
-                          <div className='text-xs text-gray-500'>
-                            Code: {subject.code}
+                          <div
+                            className={`text-xs ${
+                              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}
+                          >
+                            {t('subjects.code')}: {subject.code}
                           </div>
                         )}
                       </div>
                     </div>
                   </td>
                   <td className='px-6 py-4'>
-                    <div className='text-sm text-gray-900 max-w-xs truncate'>
-                      {subject.description || 'No description'}
+                    <div
+                      className={`text-sm ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                      } max-w-xs truncate`}
+                    >
+                      {subject.description || t('subjects.noDescription')}
                     </div>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-sm ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}
+                  >
                     <div className='space-y-1'>
                       <div>
-                        Created:{' '}
+                        {t('subjects.created')}:{' '}
                         {formatDateTime(
                           subject.created_at || subject.createdAt
                         )}
                       </div>
                       {subject.updated_at &&
                         subject.updated_at !== subject.created_at && (
-                          <div className='text-xs text-gray-400'>
-                            Updated: {formatDateTime(subject.updated_at)}
+                          <div
+                            className={`text-xs ${
+                              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                            }`}
+                          >
+                            {t('subjects.updated')}:{' '}
+                            {formatDateTime(subject.updated_at)}
                           </div>
                         )}
                     </div>
@@ -366,13 +466,21 @@ const Subjects = () => {
                     <div className='flex justify-end space-x-2'>
                       <button
                         onClick={() => handleEdit(subject)}
-                        className='text-primary-600 hover:text-primary-900 p-1 rounded hover:bg-primary-50 transition-colors duration-150'
+                        className={`${
+                          isDarkMode
+                            ? 'text-primary-400 hover:text-primary-300 hover:bg-primary-900/20'
+                            : 'text-primary-600 hover:text-primary-900 hover:bg-primary-50'
+                        } p-1 rounded transition-colors duration-150`}
                       >
                         <Edit className='h-4 w-4' />
                       </button>
                       <button
                         onClick={() => handleDelete(subject.id)}
-                        className='text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-150'
+                        className={`${
+                          isDarkMode
+                            ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
+                            : 'text-red-600 hover:text-red-900 hover:bg-red-50'
+                        } p-1 rounded transition-colors duration-150`}
                       >
                         <Trash2 className='h-4 w-4' />
                       </button>

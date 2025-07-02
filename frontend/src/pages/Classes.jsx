@@ -17,6 +17,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { classesService, subjectsService } from '../services/dataService';
+import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../utils/translations';
 
 // Helper function to format date
 const formatDateTime = (dateString) => {
@@ -29,6 +31,8 @@ const formatDateTime = (dateString) => {
 };
 
 const Classes = () => {
+  const { isDarkMode, language } = useTheme();
+  const { t } = useTranslation(language);
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +61,7 @@ const Classes = () => {
       console.log('=== FETCH DATA START ===');
       console.log('Making requests to:');
       console.log('- Classes: http://localhost:5000/classes/all');
-      console.log('- Subjects: http://localhost:5000/subjects');
+      console.log('- Subjects: http://localhost:5000/subjects/all');
 
       // Test direct fetch to see raw response
       try {
@@ -236,13 +240,13 @@ const Classes = () => {
 
   if (loading) {
     return (
-      <div className='flex flex-col items-center justify-center h-64 space-y-4'>
+      <div className='flex flex-col items-center justify-center h-48 sm:h-64 space-y-4'>
         <div className='spinner'></div>
         <div className='text-gray-600 text-center'>
-          <div className='text-mobile-base font-medium'>
+          <div className='text-xs sm:text-sm md:text-base font-medium'>
             Loading classes from backend...
           </div>
-          <div className='text-mobile-sm text-gray-500 mt-1'>
+          <div className='text-2xs sm:text-xs md:text-sm text-gray-500 mt-1'>
             Make sure backend is running on port 5000
           </div>
         </div>
@@ -251,19 +255,27 @@ const Classes = () => {
   }
 
   return (
-    <div className='space-y-4 xs:space-y-6'>
+    <div className='space-y-4 md:space-y-6'>
       {/* Header */}
-      <div className='flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3'>
-        <h1 className='text-mobile-2xl font-bold text-gray-900'>
-          Classes Management
-        </h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className='btn-primary flex items-center space-x-2 self-start xs:self-auto'
-        >
-          <Plus className='h-4 w-4 xs:h-5 xs:w-5' />
-          <span>Add Class</span>
-        </button>
+      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4'>
+        <div className='flex-1 min-w-0'>
+          <h1
+            className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            } truncate`}
+          >
+            {t('classes.title')}
+          </h1>
+        </div>
+        <div className='flex-shrink-0'>
+          <button
+            onClick={() => setShowModal(true)}
+            className='btn-primary flex items-center space-x-2 text-xs sm:text-sm md:text-base whitespace-nowrap w-full sm:w-auto justify-center'
+          >
+            <Plus className='h-4 w-4 sm:h-4 sm:w-4 md:h-5 md:w-5' />
+            <span>{t('classes.addClass')}</span>
+          </button>
+        </div>
       </div>
 
       {/* Alerts */}
@@ -272,10 +284,12 @@ const Classes = () => {
           <div className='flex items-start'>
             <AlertCircle className='h-5 w-5 mt-0.5 flex-shrink-0' />
             <div className='ml-3 min-w-0 flex-1'>
-              <div className='font-medium'>Error Loading Classes</div>
+              <div className='font-medium'>
+                {t('classes.errorLoadingClasses')}
+              </div>
               <div className='mt-1'>{error}</div>
-              <div className='text-2xs xs:text-xs mt-2 opacity-75'>
-                Make sure backend server is running on http://localhost:5000
+              <div className='text-2xs sm:text-xs md:text-sm mt-2 opacity-75'>
+                {t('classes.backendServerNote')}
               </div>
             </div>
           </div>
@@ -292,37 +306,50 @@ const Classes = () => {
       )}
 
       {/* Search and Filter */}
-      <div className='flex flex-col sm:flex-row gap-3 xs:gap-4'>
-        <div className='relative flex-1'>
-          <Search className='absolute left-3 xs:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 xs:h-5 xs:w-5 text-gray-400 transition-colors group-focus-within:text-primary-500' />
+      <div className='flex flex-col sm:flex-row gap-3 md:gap-4'>
+        <div className='relative flex-1 min-w-0'>
+          <Search
+            className={`absolute left-2 sm:left-3 md:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-4 sm:w-4 md:h-5 md:w-5 ${
+              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+            } transition-colors group-focus-within:text-primary-500`}
+          />
           <input
             type='text'
-            placeholder='Search classes...'
-            className='input-field pl-10 xs:pl-12'
+            placeholder={t('classes.searchClasses')}
+            className='input-field pl-8 sm:pl-10 md:pl-12 text-xs sm:text-sm md:text-base w-full'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg'
+              className={`absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 ${
+                isDarkMode
+                  ? 'text-gray-500 hover:text-gray-300'
+                  : 'text-gray-400 hover:text-gray-600'
+              } text-lg`}
             >
               ×
             </button>
           )}
         </div>
-        <div className='flex items-center space-x-2 xs:space-x-3'>
-          <button className='btn-secondary flex items-center space-x-2'>
-            <Filter className='h-4 w-4' />
-            <span className='hidden xs:inline'>Filter</span>
+        <div className='flex items-center space-x-2 sm:space-x-3 flex-shrink-0'>
+          <button className='btn-secondary flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm md:text-base whitespace-nowrap flex-1 sm:flex-initial justify-center'>
+            <Filter className='h-3 w-3 sm:h-4 sm:w-4' />
+            <span className='hidden sm:inline'>{t('common.filter')}</span>
+            <span className='sm:hidden'>Filter</span>
           </button>
           <button
             onClick={fetchData}
-            className='btn-icon text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+            className={`btn-icon ${
+              isDarkMode
+                ? 'text-gray-400 hover:text-primary-400 hover:bg-primary-900/20'
+                : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+            }`}
             disabled={loading}
           >
             <RefreshCw
-              className={`h-4 w-4 xs:h-5 xs:w-5 ${
+              className={`h-4 w-4 sm:h-4 sm:w-4 md:h-5 md:w-5 ${
                 loading ? 'animate-spin' : ''
               }`}
             />
@@ -331,57 +358,95 @@ const Classes = () => {
       </div>
 
       {/* Classes List */}
-      <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 xs:gap-4 lg:gap-6'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6'>
         {currentClasses.map((classItem) => {
           const subject = subjects.find((s) => s.id === classItem.subject_id);
           return (
             <div
               key={classItem.id}
-              className='card p-4 xs:p-6 hover:shadow-lg transition-shadow duration-200'
+              className={`${
+                isDarkMode
+                  ? 'bg-gray-800 border-gray-700'
+                  : 'bg-white border-gray-200'
+              } border rounded-lg p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200`}
             >
-              <div className='flex items-start justify-between mb-3 xs:mb-4'>
-                <h3 className='text-mobile-lg font-semibold text-gray-900 truncate flex-1 mr-2'>
+              <div className='flex items-start justify-between mb-2 sm:mb-3'>
+                <h3
+                  className={`text-sm sm:text-base md:text-lg font-semibold ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  } truncate flex-1 mr-2`}
+                >
                   {classItem.name}
                 </h3>
-                <div className='flex space-x-1'>
+                <div className='flex space-x-1 flex-shrink-0'>
                   <button
                     onClick={() => handleEdit(classItem)}
-                    className='btn-icon text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+                    className={`p-1 sm:p-1.5 md:p-2 rounded-md transition-colors ${
+                      isDarkMode
+                        ? 'text-gray-400 hover:text-primary-400 hover:bg-primary-900/20'
+                        : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+                    }`}
                   >
-                    <Edit className='h-4 w-4' />
+                    <Edit className='h-3 w-3 sm:h-4 sm:w-4' />
                   </button>
                   <button
                     onClick={() => handleDelete(classItem.id)}
-                    className='btn-icon text-gray-500 hover:text-red-600 hover:bg-red-50'
+                    className={`p-1 sm:p-1.5 md:p-2 rounded-md transition-colors ${
+                      isDarkMode
+                        ? 'text-gray-400 hover:text-red-400 hover:bg-red-900/20'
+                        : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+                    }`}
                   >
-                    <Trash2 className='h-4 w-4' />
+                    <Trash2 className='h-3 w-3 sm:h-4 sm:w-4' />
                   </button>
                 </div>
               </div>
 
-              <p className='text-mobile-sm text-gray-600 mb-3 xs:mb-4 line-clamp-2'>
+              <p
+                className={`text-xs sm:text-sm ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                } mb-3 sm:mb-4 line-clamp-2`}
+              >
                 {classItem.description}
               </p>
 
-              <div className='flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 xs:gap-0 text-mobile-sm mb-3 xs:mb-4'>
-                <div className='flex items-center text-gray-500'>
-                  <BookOpen className='h-4 w-4 mr-1.5 flex-shrink-0' />
+              <div
+                className={`flex flex-col gap-1 sm:gap-2 text-xs sm:text-sm mb-3 sm:mb-4`}
+              >
+                <div
+                  className={`flex items-center ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                >
+                  <BookOpen className='h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 flex-shrink-0' />
                   <span className='truncate'>
-                    {subject?.name || 'No Subject'}
+                    {subject?.name || t('classes.noSubject')}
                   </span>
                 </div>
-                <div className='flex items-center text-gray-500'>
-                  <Users className='h-4 w-4 mr-1.5 flex-shrink-0' />
-                  <span>0 Students</span>
+                <div
+                  className={`flex items-center ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                >
+                  <Users className='h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 flex-shrink-0' />
+                  <span>{t('classes.students', '0 Students')}</span>
                 </div>
               </div>
 
-              <div className='pt-3 xs:pt-4 border-t border-gray-200'>
-                <div className='text-2xs xs:text-xs text-gray-500 space-y-1'>
+              <div
+                className={`pt-2 sm:pt-3 border-t ${
+                  isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                }`}
+              >
+                <div
+                  className={`text-2xs sm:text-xs ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  } space-y-1`}
+                >
                   <div className='flex items-center'>
-                    <Calendar className='h-3 w-3 mr-1.5 flex-shrink-0' />
-                    <span className='truncate'>
-                      Created:{' '}
+                    <Calendar className='h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1 sm:mr-1.5 flex-shrink-0' />
+                    <span className='truncate text-2xs sm:text-xs'>
+                      {t('classes.created')}:{' '}
                       {formatDateTime(
                         classItem.created_at || classItem.createdAt
                       )}
@@ -390,9 +455,10 @@ const Classes = () => {
                   {classItem.updated_at &&
                     classItem.updated_at !== classItem.created_at && (
                       <div className='flex items-center'>
-                        <Calendar className='h-3 w-3 mr-1.5 flex-shrink-0' />
-                        <span className='truncate'>
-                          Updated: {formatDateTime(classItem.updated_at)}
+                        <Calendar className='h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1 sm:mr-1.5 flex-shrink-0' />
+                        <span className='truncate text-2xs sm:text-xs'>
+                          {t('classes.updated')}:{' '}
+                          {formatDateTime(classItem.updated_at)}
                         </span>
                       </div>
                     )}
@@ -403,36 +469,64 @@ const Classes = () => {
         })}
       </div>
 
-      {/* Mobile Pagination */}
+      {/* Pagination */}
       {filteredClasses.length > 0 && totalPages > 1 && (
-        <div className='bg-white border border-gray-200 rounded-lg p-3 xs:p-4'>
+        <div
+          className={`${
+            isDarkMode
+              ? 'bg-gray-800 border-gray-700'
+              : 'bg-white border-gray-200'
+          } rounded-lg p-4 border mt-6`}
+        >
           {/* Mobile pagination controls */}
           <div className='flex items-center justify-between sm:hidden'>
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className='btn-secondary disabled:opacity-50 disabled:cursor-not-allowed'
+              className={`flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded-md transition-colors ${
+                currentPage === 1
+                  ? 'opacity-50 cursor-not-allowed'
+                  : isDarkMode
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
             >
-              <ChevronLeft className='h-4 w-4 mr-1' />
-              Previous
+              <ChevronLeft className='h-3 w-3 sm:h-4 sm:w-4 mr-1' />
+              <span className='hidden sm:inline'>Previous</span>
+              <span className='sm:hidden'>Prev</span>
             </button>
-            <span className='text-mobile-sm text-gray-700'>
-              Page {currentPage} of {totalPages}
+            <span
+              className={`text-xs sm:text-sm font-medium ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}
+            >
+              {currentPage} / {totalPages}
             </span>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className='btn-secondary disabled:opacity-50 disabled:cursor-not-allowed'
+              className={`flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded-md transition-colors ${
+                currentPage === totalPages
+                  ? 'opacity-50 cursor-not-allowed'
+                  : isDarkMode
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
             >
-              Next
-              <ChevronRight className='h-4 w-4 ml-1' />
+              <span className='hidden sm:inline'>Next</span>
+              <span className='sm:hidden'>Next</span>
+              <ChevronRight className='h-3 w-3 sm:h-4 sm:w-4 ml-1' />
             </button>
           </div>
 
           {/* Desktop pagination */}
           <div className='hidden sm:flex sm:items-center sm:justify-between'>
             <div>
-              <p className='text-mobile-sm text-gray-700'>
+              <p
+                className={`text-xs sm:text-sm ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}
+              >
                 Showing <span className='font-medium'>{startIndex + 1}</span> to{' '}
                 <span className='font-medium'>
                   {Math.min(endIndex, filteredClasses.length)}
@@ -442,13 +536,19 @@ const Classes = () => {
               </p>
             </div>
             <div>
-              <nav className='isolate inline-flex -space-x-px rounded-md shadow-sm'>
+              <nav className='flex space-x-1'>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className='relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed'
+                  className={`p-1.5 sm:p-2 rounded-md transition-colors ${
+                    currentPage === 1
+                      ? 'opacity-50 cursor-not-allowed'
+                      : isDarkMode
+                      ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+                      : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                  }`}
                 >
-                  <ChevronLeft className='h-5 w-5' />
+                  <ChevronLeft className='h-4 w-4 sm:h-5 sm:w-5' />
                 </button>
                 {[...Array(Math.min(totalPages, 5))].map((_, index) => {
                   const page = index + 1;
@@ -456,10 +556,14 @@ const Classes = () => {
                     <button
                       key={page}
                       onClick={() => handlePageChange(page)}
-                      className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                      className={`px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
                         currentPage === page
-                          ? 'z-10 bg-primary-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600'
-                          : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                          ? isDarkMode
+                            ? 'bg-primary-600 text-white'
+                            : 'bg-primary-600 text-white'
+                          : isDarkMode
+                          ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+                          : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
                       }`}
                     >
                       {page}
@@ -469,9 +573,15 @@ const Classes = () => {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className='relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed'
+                  className={`p-1.5 sm:p-2 rounded-md transition-colors ${
+                    currentPage === totalPages
+                      ? 'opacity-50 cursor-not-allowed'
+                      : isDarkMode
+                      ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+                      : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                  }`}
                 >
-                  <ChevronRight className='h-5 w-5' />
+                  <ChevronRight className='h-4 w-4 sm:h-5 sm:w-5' />
                 </button>
               </nav>
             </div>
@@ -481,12 +591,24 @@ const Classes = () => {
 
       {/* Empty State */}
       {filteredClasses.length === 0 && !loading && (
-        <div className='text-center py-8 xs:py-12'>
-          <GraduationCap className='mx-auto h-12 w-12 xs:h-16 xs:w-16 text-gray-300' />
-          <h3 className='mt-3 xs:mt-4 text-mobile-base font-medium text-gray-900'>
+        <div className='text-center py-6 sm:py-8 md:py-12'>
+          <GraduationCap
+            className={`mx-auto h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 ${
+              isDarkMode ? 'text-gray-600' : 'text-gray-300'
+            }`}
+          />
+          <h3
+            className={`mt-3 sm:mt-4 text-base sm:text-lg md:text-xl font-medium ${
+              isDarkMode ? 'text-gray-200' : 'text-gray-900'
+            }`}
+          >
             No classes found
           </h3>
-          <p className='mt-1 xs:mt-2 text-mobile-sm text-gray-500'>
+          <p
+            className={`mt-2 text-xs sm:text-sm md:text-base ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}
+          >
             {searchTerm
               ? 'Try adjusting your search criteria.'
               : 'No classes available.'}
@@ -494,7 +616,13 @@ const Classes = () => {
 
           {/* Debug info - only show in development */}
           {process.env.NODE_ENV === 'development' && (
-            <div className='mt-4 xs:mt-6 p-3 xs:p-4 bg-gray-50 rounded-lg text-left text-2xs xs:text-xs text-gray-400 space-y-1 max-w-md mx-auto'>
+            <div
+              className={`mt-6 p-4 ${
+                isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
+              } rounded-lg text-left text-xs ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              } space-y-1 max-w-md mx-auto`}
+            >
               <div>Total classes loaded: {classes.length}</div>
               <div>Backend endpoint: /classes/all</div>
               <div>Search term: "{searchTerm}"</div>
@@ -506,10 +634,14 @@ const Classes = () => {
 
           <button
             onClick={fetchData}
-            className='mt-4 xs:mt-6 btn-primary flex items-center space-x-2 mx-auto'
+            className='mt-3 sm:mt-4 md:mt-6 btn-primary flex items-center space-x-2 mx-auto text-xs sm:text-sm md:text-base'
             disabled={loading}
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                loading ? 'animate-spin' : ''
+              }`}
+            />
             <span>Try Refresh</span>
           </button>
         </div>
@@ -517,22 +649,25 @@ const Classes = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4'>
-          <div className='relative w-full max-w-md bg-white rounded-lg shadow-lg animate-slide-up'>
-            <div className='p-4 xs:p-6'>
-              <div className='flex items-center justify-between mb-4 xs:mb-6'>
-                <h3 className='text-mobile-lg font-medium text-gray-900'>
+        <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-3 sm:p-4'>
+          <div className='relative w-full max-w-xs sm:max-w-md bg-white rounded-lg shadow-lg animate-slide-up'>
+            <div className='p-3 sm:p-4 md:p-6'>
+              <div className='flex items-center justify-between mb-3 sm:mb-4 md:mb-6'>
+                <h3 className='text-base sm:text-lg md:text-xl font-medium text-gray-900'>
                   {editingClass ? 'Edit Class' : 'Add New Class'}
                 </h3>
                 <button
                   onClick={resetForm}
                   className='btn-icon text-gray-400 hover:text-gray-600'
                 >
-                  <X className='h-5 w-5' />
+                  <X className='h-4 w-4 sm:h-5 sm:w-5' />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className='space-y-4 xs:space-y-5'>
+              <form
+                onSubmit={handleSubmit}
+                className='space-y-3 sm:space-y-4 md:space-y-5'
+              >
                 <div>
                   <label className='label'>Class Name</label>
                   <input
@@ -579,17 +714,17 @@ const Classes = () => {
                   </select>
                 </div>
 
-                <div className='flex flex-col xs:flex-row gap-3 xs:justify-end pt-4 xs:pt-6'>
+                <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end pt-3 sm:pt-4 md:pt-6'>
                   <button
                     type='button'
                     onClick={resetForm}
-                    className='btn-secondary order-2 xs:order-1'
+                    className='btn-secondary order-2 sm:order-1 text-xs sm:text-sm md:text-base'
                   >
                     Cancel
                   </button>
                   <button
                     type='submit'
-                    className='btn-primary order-1 xs:order-2'
+                    className='btn-primary order-1 sm:order-2 text-xs sm:text-sm md:text-base'
                   >
                     {editingClass ? 'Update' : 'Create'}
                   </button>

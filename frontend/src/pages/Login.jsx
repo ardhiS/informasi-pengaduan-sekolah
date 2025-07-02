@@ -331,15 +331,15 @@ const Login = () => {
                 <p>Create your account to access the dashboard</p>
                 <div className='flex flex-col xs:flex-row gap-2 xs:gap-4 mt-3 text-2xs'>
                   <div className='flex items-center space-x-1'>
-                    <User className='h-3 w-3' />
+                    <User className='h-3 w-3 text-blue-600' />
                     <span>Siswa</span>
                   </div>
                   <div className='flex items-center space-x-1'>
-                    <GraduationCap className='h-3 w-3' />
+                    <GraduationCap className='h-3 w-3 text-green-600' />
                     <span>Guru</span>
                   </div>
                   <div className='flex items-center space-x-1'>
-                    <Shield className='h-3 w-3' />
+                    <Shield className='h-3 w-3 text-purple-600' />
                     <span>Admin</span>
                   </div>
                 </div>

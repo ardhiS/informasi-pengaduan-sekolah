@@ -92,10 +92,10 @@ class AuthService {
     }
   }
 
-  async getUserById(id) {
+  async getUserById(userId) {
     const query = {
-      text: 'SELECT id, username, fullname, role, created_at FROM users WHERE id = $1',
-      values: [id],
+      text: 'SELECT id, username, fullname, role FROM users WHERE id = $1',
+      values: [userId],
     };
 
     const result = await this._pool.query(query);
@@ -104,7 +104,13 @@ class AuthService {
       throw new NotFoundError('User tidak ditemukan');
     }
 
-    return result.rows[0];
+    const user = result.rows[0];
+    return {
+      userId: user.id,
+      username: user.username,
+      fullname: user.fullname,
+      role: user.role,
+    };
   }
 
   verifyToken(token) {
@@ -152,7 +158,13 @@ class AuthService {
       throw new InvariantError('Kredensial yang Anda berikan salah');
     }
 
-    return user.id;
+    // Return full user data instead of just ID
+    return {
+      userId: user.id,
+      username: user.username,
+      fullname: user.fullname,
+      role: user.role,
+    };
   }
 }
 

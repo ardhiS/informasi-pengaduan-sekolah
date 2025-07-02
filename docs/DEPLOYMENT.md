@@ -2,6 +2,84 @@
 
 ## Website Pengaduan SMP PLUS AT-THAHIRIN
 
+---
+
+## 🌐 QUICK PUBLIC ACCESS (Sharing Link untuk Demo)
+
+### Metode Termudah: Ngrok Tunneling
+
+#### 1. Install Ngrok
+
+```bash
+# Download dari https://ngrok.com/download dan install
+# Atau via npm:
+npm install -g ngrok
+
+# Daftar gratis di ngrok.com untuk authtoken
+ngrok authtoken YOUR_AUTHTOKEN_HERE
+```
+
+#### 2. Start Both Services & Expose
+
+```bash
+# Terminal 1: Start Backend
+cd "c:\Users\Lenovo\OneDrive\Desktop\informasi-pengaduan-sekolah-1"
+npm start
+
+# Terminal 2: Start Frontend
+cd "c:\Users\Lenovo\OneDrive\Desktop\informasi-pengaduan-sekolah-1\frontend"
+npm run dev
+
+# Terminal 3: Expose Backend to Internet
+ngrok http 5000
+
+# Terminal 4: Expose Frontend to Internet
+ngrok http 3000
+```
+
+#### 3. Update Frontend API Configuration
+
+```javascript
+// frontend/src/services/api.js
+// Ganti dengan ngrok URL backend Anda
+const API_BASE_URL = 'https://your-backend-id.ngrok.io';
+```
+
+#### 4. Share the Link!
+
+```
+Frontend URL: https://your-frontend-id.ngrok.io
+Backend API: https://your-backend-id.ngrok.io
+
+Share frontend URL untuk akses publik!
+```
+
+### Alternatif Cepat Lainnya:
+
+#### A. Localtunnel (Tanpa Registrasi)
+
+```bash
+npm install -g localtunnel
+
+# Expose frontend
+lt --port 3000 --subdomain school-demo
+
+# Expose backend
+lt --port 5000 --subdomain school-api
+```
+
+#### B. Serveo (SSH Tunneling)
+
+```bash
+# Frontend
+ssh -R 80:localhost:3000 serveo.net
+
+# Backend
+ssh -R 80:localhost:5000 serveo.net
+```
+
+---
+
 ### 🚀 Production Deployment
 
 #### Prerequisites

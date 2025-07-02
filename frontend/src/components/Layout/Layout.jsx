@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 const Layout = ({ children }) => {
+  const { isDarkMode } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Close sidebar when screen size changes to desktop
@@ -20,7 +22,11 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
-    <div className='flex h-screen bg-gray-50 overflow-hidden'>
+    <div
+      className={`flex h-screen overflow-hidden ${
+        isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+      }`}
+    >
       {/* Sidebar */}
       <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
@@ -30,7 +36,11 @@ const Layout = ({ children }) => {
         <Header onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Page content */}
-        <main className='flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 scroll-smooth'>
+        <main
+          className={`flex-1 overflow-x-hidden overflow-y-auto scroll-smooth ${
+            isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+          }`}
+        >
           {/* Mobile-optimized container */}
           <div className='container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-4 xs:py-6 lg:py-8 max-w-full'>
             <div className='animate-fade-in'>{children || <Outlet />}</div>

@@ -15,15 +15,26 @@ class AuthenticationsHandler {
     this._validator.validatePostAuthenticationPayload(request.payload);
 
     const { username, password } = request.payload;
-    const userId = await this._authService.verifyUserCredential(
+    const userData = await this._authService.verifyUserCredential(
       username,
       password
     );
 
-    const accessToken = this._authService.generateAccessToken({ userId });
-    const refreshToken = this._authService.generateRefreshToken({ userId });
+    // Generate token with full user data
+    const accessToken = this._authService.generateAccessToken({
+      userId: userData.userId,
+      username: userData.username,
+      fullname: userData.fullname,
+      role: userData.role,
+    });
+    const refreshToken = this._authService.generateRefreshToken({
+      userId: userData.userId,
+    });
 
-    await this._refreshTokenService.addRefreshToken(userId, refreshToken);
+    await this._refreshTokenService.addRefreshToken(
+      userData.userId,
+      refreshToken
+    );
 
     const response = h.response({
       status: 'success',
@@ -44,7 +55,15 @@ class AuthenticationsHandler {
     await this._refreshTokenService.verifyRefreshToken(refreshToken);
     const { userId } = this._authService.verifyRefreshToken(refreshToken);
 
-    const accessToken = this._authService.generateAccessToken({ userId });
+    // Get full user data for token generation
+    const userData = await this._authService.getUserById(userId);
+
+    const accessToken = this._authService.generateAccessToken({
+      userId: userData.userId,
+      username: userData.username,
+      fullname: userData.fullname,
+      role: userData.role,
+    });
 
     return {
       status: 'success',

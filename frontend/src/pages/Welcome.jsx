@@ -39,21 +39,21 @@ const Welcome = () => {
             <div className='flex flex-col xs:flex-row gap-2 xs:gap-4'>
               <Link
                 to='/login-page'
-                className='inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-primary-600 bg-primary-100 hover:bg-primary-200 transition-colors'
+                className='inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200 transition-colors'
               >
                 <LogIn className='h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                 Login Siswa
               </Link>
               <Link
                 to='/login?mode=login'
-                className='inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-secondary-600 bg-secondary-100 hover:bg-secondary-200 transition-colors'
+                className='inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-purple-600 bg-purple-100 hover:bg-purple-200 transition-colors'
               >
                 <LogIn className='h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                 Login Admin
               </Link>
               <Link
                 to='/login?mode=register'
-                className='inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors'
+                className='inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors'
               >
                 <UserPlus className='h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                 Register
@@ -88,7 +88,7 @@ const Welcome = () => {
           <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4'>
             <Link
               to='/halaman-siswa'
-              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-base sm:text-lg font-medium rounded-lg text-white bg-cyan-500 hover:bg-cyan-600 transition-colors shadow-lg hover:shadow-xl'
+              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-base sm:text-lg font-medium rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg hover:shadow-xl'
             >
               <LogIn className='h-4 w-4 sm:h-5 sm:w-5 mr-2' />
               Halaman Siswa
@@ -96,7 +96,7 @@ const Welcome = () => {
             </Link>
             <Link
               to='/halaman-guru'
-              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-base sm:text-lg font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl'
+              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-base sm:text-lg font-medium rounded-lg text-white bg-green-500 hover:bg-green-600 transition-colors shadow-lg hover:shadow-xl'
             >
               <LogIn className='h-4 w-4 sm:h-5 sm:w-5 mr-2' />
               Halaman Guru
@@ -104,7 +104,7 @@ const Welcome = () => {
             </Link>
             <Link
               to='/login?mode=login'
-              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-primary-600 text-base sm:text-lg font-medium rounded-lg text-primary-600 bg-white hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl'
+              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-purple-600 text-base sm:text-lg font-medium rounded-lg text-purple-600 bg-white hover:bg-purple-50 transition-colors shadow-lg hover:shadow-xl'
             >
               <LogIn className='h-4 w-4 sm:h-5 sm:w-5 mr-2' />
               Admin Dashboard
@@ -112,7 +112,7 @@ const Welcome = () => {
             </Link>
             <Link
               to='/login?mode=register'
-              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-primary-600 text-base sm:text-lg font-medium rounded-lg text-primary-600 bg-white hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl'
+              className='w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-blue-600 text-base sm:text-lg font-medium rounded-lg text-blue-600 bg-white hover:bg-blue-50 transition-colors shadow-lg hover:shadow-xl'
             >
               <UserPlus className='h-4 w-4 sm:h-5 sm:w-5 mr-2' />
               Create New Account

@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState } from 'react';
 
 const ApiContext = createContext(null);
 
+export { ApiContext };
+
 export const useApi = () => {
   const context = useContext(ApiContext);
   if (!context) {

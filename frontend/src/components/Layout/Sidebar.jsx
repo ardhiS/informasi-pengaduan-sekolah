@@ -11,18 +11,14 @@ import {
   MessageSquare,
   AlertTriangle,
 } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+import { useTranslation } from '../../utils/translations';
 import AtThahirinLogo from '../AtThahirinLogo';
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Pengaduan', href: '/complaints', icon: MessageSquare, new: true },
-  { name: 'Users', href: '/users', icon: Users },
-  { name: 'Classes', href: '/classes', icon: GraduationCap },
-  { name: 'Subjects', href: '/subjects', icon: BookOpen },
-  { name: 'Profile', href: '/profile', icon: UserCircle },
-];
-
 const Sidebar = ({ open, setOpen }) => {
+  const { isDarkMode, language } = useTheme();
+  const { t } = useTranslation(language);
+
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
     const handleEscape = (e) => {
@@ -54,7 +50,11 @@ const Sidebar = ({ open, setOpen }) => {
             className='fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity duration-300'
             onClick={() => setOpen(false)}
           />
-          <div className='relative flex-1 flex flex-col max-w-xs w-full bg-white animate-slide-up'>
+          <div
+            className={`relative flex-1 flex flex-col max-w-xs w-full ${
+              isDarkMode ? 'bg-gray-800' : 'bg-white'
+            } animate-slide-up`}
+          >
             {/* Close button */}
             <div className='absolute top-0 right-0 -mr-12 pt-2'>
               <button
@@ -77,7 +77,13 @@ const Sidebar = ({ open, setOpen }) => {
       {/* Desktop sidebar */}
       <div className='hidden md:flex md:flex-shrink-0'>
         <div className='flex flex-col w-64'>
-          <div className='flex flex-col flex-grow pt-5 pb-4 overflow-y-auto bg-white border-r border-gray-200 shadow-sm'>
+          <div
+            className={`flex flex-col flex-grow pt-5 pb-4 overflow-y-auto ${
+              isDarkMode
+                ? 'bg-gray-800 border-gray-700'
+                : 'bg-white border-gray-200'
+            } border-r shadow-sm`}
+          >
             <SidebarContent />
           </div>
         </div>
@@ -87,6 +93,23 @@ const Sidebar = ({ open, setOpen }) => {
 };
 
 const SidebarContent = ({ mobile = false, onNavigate }) => {
+  const { isDarkMode, language } = useTheme();
+  const { t } = useTranslation(language);
+
+  const navigation = [
+    { name: t('dashboard', 'Dashboard'), href: '/dashboard', icon: Home },
+    {
+      name: t('complaints', 'Pengaduan'),
+      href: '/complaints',
+      icon: MessageSquare,
+      new: true,
+    },
+    { name: t('users', 'Users'), href: '/users', icon: Users },
+    { name: t('classes', 'Classes'), href: '/classes', icon: GraduationCap },
+    { name: t('subjects', 'Subjects'), href: '/subjects', icon: BookOpen },
+    { name: t('profile', 'Profile'), href: '/profile', icon: UserCircle },
+  ];
+
   const handleNavigationClick = () => {
     if (mobile && onNavigate) {
       onNavigate();
@@ -98,16 +121,28 @@ const SidebarContent = ({ mobile = false, onNavigate }) => {
       {/* Logo/Brand */}
       <NavLink
         to='/dashboard'
-        className='flex items-center flex-shrink-0 px-4 py-3 hover:bg-green-50 transition-all duration-200 ease-in-out transform hover:scale-105 rounded-lg mx-2'
+        className={`flex items-center flex-shrink-0 px-4 py-3 ${
+          isDarkMode
+            ? 'hover:bg-green-900/30 text-green-300'
+            : 'hover:bg-green-50 text-green-800'
+        } transition-all duration-200 ease-in-out transform hover:scale-105 rounded-lg mx-2`}
         onClick={handleNavigationClick}
       >
         <AtThahirinLogo className='h-8 w-8 transition-all duration-200 ease-in-out' />
         <div className='ml-3 flex flex-col'>
-          <span className='text-sm font-bold text-green-800 leading-tight'>
+          <span
+            className={`text-sm font-bold leading-tight ${
+              isDarkMode ? 'text-green-300' : 'text-green-800'
+            }`}
+          >
             SMP AT-THAHIRIN
           </span>
-          <span className='text-xs text-green-600 leading-tight'>
-            Website Pengaduan
+          <span
+            className={`text-xs leading-tight ${
+              isDarkMode ? 'text-green-400' : 'text-green-600'
+            }`}
+          >
+            {t('complaintSystem', 'Website Pengaduan')}
           </span>
         </div>
       </NavLink>
@@ -117,13 +152,17 @@ const SidebarContent = ({ mobile = false, onNavigate }) => {
         <nav className='flex-1 px-2 space-y-1'>
           {navigation.map((item) => (
             <NavLink
-              key={item.name}
+              key={item.href}
               to={item.href}
               onClick={handleNavigationClick}
               className={({ isActive }) =>
                 `group flex items-center px-3 py-3 xs:py-2 text-sm xs:text-base font-medium rounded-md transition-all duration-200 ease-in-out touch-manipulation relative ${
                   isActive
-                    ? 'bg-primary-100 text-primary-900 border-r-4 border-primary-600'
+                    ? isDarkMode
+                      ? 'bg-primary-900/50 text-primary-200 border-r-4 border-primary-400'
+                      : 'bg-primary-100 text-primary-900 border-r-4 border-primary-600'
+                    : isDarkMode
+                    ? 'text-gray-300 hover:bg-gray-700 hover:text-gray-100 active:bg-gray-600'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100'
                 }`
               }
@@ -136,7 +175,7 @@ const SidebarContent = ({ mobile = false, onNavigate }) => {
               {/* New badge for Pengaduan */}
               {item.new && (
                 <span className='ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse'>
-                  NEW
+                  {t('new', 'NEW')}
                 </span>
               )}
             </NavLink>
@@ -145,9 +184,17 @@ const SidebarContent = ({ mobile = false, onNavigate }) => {
 
         {/* Footer for mobile */}
         {mobile && (
-          <div className='mt-8 px-4 py-4 border-t border-gray-200'>
-            <div className='text-xs text-gray-500 text-center'>
-              <p>School Management System</p>
+          <div
+            className={`mt-8 px-4 py-4 border-t ${
+              isDarkMode ? 'border-gray-700' : 'border-gray-200'
+            }`}
+          >
+            <div
+              className={`text-xs text-center ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}
+            >
+              <p>{t('managementSystem', 'School Management System')}</p>
               <p className='mt-1'>v1.0.0</p>
             </div>
           </div>

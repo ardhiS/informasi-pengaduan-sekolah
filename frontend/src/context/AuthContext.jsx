@@ -4,6 +4,8 @@ import api from '../services/api';
 
 const AuthContext = createContext(null);
 
+export { AuthContext };
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -39,11 +41,21 @@ export const AuthProvider = ({ children }) => {
         // Decode JWT to get user info
         try {
           const decodedToken = jwtDecode(accessToken);
+          console.log('🔍 Restored token:', decodedToken);
+
+          // Check if token is expired
+          const isExpired = decodedToken.exp * 1000 < Date.now();
+          if (isExpired) {
+            console.warn('⚠️ Stored token is expired, clearing...');
+            logout();
+            return;
+          }
+
           const userInfo = {
-            id: decodedToken.payload?.userId,
-            username: decodedToken.payload?.username,
-            fullname: decodedToken.payload?.fullname,
-            role: decodedToken.payload?.role || 'user',
+            id: decodedToken.userId,
+            username: decodedToken.username,
+            fullname: decodedToken.fullname,
+            role: decodedToken.role || 'user',
           };
           setUser(userInfo);
           console.log('Restored user info from token:', userInfo);
@@ -60,12 +72,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (username, password) => {
+  const login = async (username, password, role = null) => {
     try {
-      const response = await api.post('/authentications', {
+      console.log('🔐 Login attempt:', { username, password: '***', role });
+
+      const requestData = {
         username,
         password,
-      });
+      };
+
+      console.log('📤 Sending to /api/authentications:', requestData);
+
+      const response = await api.post('/api/authentications', requestData);
+
+      console.log('✅ Login response:', response.data);
 
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
         response.data.data;
@@ -81,27 +101,33 @@ export const AuthProvider = ({ children }) => {
       // Decode JWT to get user info
       try {
         const decodedToken = jwtDecode(newAccessToken);
+        console.log('🔍 Decoded token:', decodedToken);
+
         const userInfo = {
-          id: decodedToken.payload?.userId,
-          username: decodedToken.payload?.username || username,
-          fullname: decodedToken.payload?.fullname,
-          role: decodedToken.payload?.role || 'user',
+          id: decodedToken.userId,
+          username: decodedToken.username || username,
+          fullname: decodedToken.fullname,
+          role: decodedToken.role || role || 'user',
         };
         setUser(userInfo);
-        console.log('Decoded user info:', userInfo);
+
+        // Store role for logout redirect
+        localStorage.setItem('lastRole', userInfo.role);
+
+        console.log('✅ User info set:', userInfo);
+        console.log('👤 Decoded user info:', userInfo);
       } catch (decodeError) {
-        console.error('Failed to decode token:', decodeError);
+        console.error('❌ Failed to decode token:', decodeError);
         // Fallback to basic user info
-        setUser({ username, role: 'user' });
+        setUser({ username, role: role || 'user' });
       }
 
-      return { success: true };
+      return true; // Return boolean untuk compatibility
     } catch (error) {
-      console.error('Login failed:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Login failed',
-      };
+      console.error('❌ Login failed:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      return false; // Return false untuk error
     }
   };
 
@@ -121,19 +147,23 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (refreshToken) {
-        await api.delete('/authentications', {
+        await api.delete('/api/authentications', {
           data: { refreshToken },
         });
       }
     } catch (error) {
       console.error('Logout request failed:', error);
     } finally {
+      // Clear user state and tokens
       setUser(null);
       setAccessToken(null);
       setRefreshToken(null);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('lastRole'); // Clear any cached role
       delete api.defaults.headers.common['Authorization'];
+
+      console.log('✅ Logout completed, user data cleared');
     }
   };
 
