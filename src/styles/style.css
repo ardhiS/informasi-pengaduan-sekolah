@@ -1,0 +1,82 @@
+/* Font Inter */
+body {
+	font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		sans-serif;
+}
+
+/* CSS bikin sendiri - Halaman Login */
+.kotak-login {
+	max-width: 450px;
+	margin: 2rem auto;
+	border: none;
+	border-radius: 0.75rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.logo-login {
+	width: 80px;
+	height: auto;
+}
+
+/* Custom CSS Button dari Boostrap */
+.btn-info {
+	background-color: #0dcaf0 !important;
+	border-color: #0dcaf0 !important;
+	color: white !important;
+}
+
+.btn-info:hover {
+	background-color: #0bb5d3 !important;
+	border-color: #0bb5d3 !important;
+	color: white !important;
+}
+
+.btn-outline-info {
+	color: #0dcaf0 !important;
+	border-color: #0dcaf0 !important;
+}
+
+.btn-outline-info:hover {
+	background-color: #0dcaf0 !important;
+	border-color: #0dcaf0 !important;
+	color: white !important;
+}
+
+/* Custom CSS Alert dari Boostrap - Halaman Beranda */
+.alert-success-custom {
+	background-color: #d1e7dd;
+	border-color: #badbcc;
+	color: #0f5132;
+}
+
+.alert-success-custom .shield-icon {
+	color: #198754;
+}
+
+.alert-success-custom .link-custom {
+	color: #0f5132;
+}
+
+/* CSS bikin sendiri Text Logo Gradient -  Halaman Beranda */
+.text-logo-gradient {
+	background: linear-gradient(135deg, #0dcaf0 0%, #198754 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Custom CSS Alert dari Boostrap - Halaman Login */
+.alert-login {
+	max-width: 450px;
+	background-color: #d1e7dd;
+	border-color: #badbcc;
+	color: #0f5132;
+}
+
+.alert-login .shield-icon-login {
+	color: #198754;
+}
+
+.alert-login .link-login {
+	color: #0f5132;
+}
