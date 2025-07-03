@@ -13,7 +13,8 @@ import {
   Crown,
   GraduationCap,
 } from 'lucide-react';
-import { usersService } from '../services/dataService';
+import apiService from '../services/apiService';
+import { Card, DataTable, Modal, Form } from '../components';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from '../utils/translations';
 import { getRoleBadgeColor, getRoleSecondaryColor } from '../utils/roleColors';
@@ -37,7 +38,7 @@ const Users = () => {
       setError('');
       console.log('Fetching users from backend...');
 
-      const response = await usersService.getAll();
+      const response = await apiService.getUsers({ role: roleFilter });
       console.log('Users response:', response);
 
       setUsers(response.data.users || []);

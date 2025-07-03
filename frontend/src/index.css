@@ -56,6 +56,49 @@
     @apply block w-full px-3 py-3 xs:py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base xs:text-sm touch-manipulation bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100;
   }
 
+  /* Filter dropdowns styling */
+  .filter-select {
+    transition: all 0.2s ease-in-out;
+    min-width: 0; /* Allow flexbox to shrink */
+    flex-shrink: 1;
+  }
+
+  .filter-select:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .filter-select:focus {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .filter-select option {
+    padding: 8px 12px;
+  }
+
+  /* Responsive grid for filters */
+  .filters-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  @media (min-width: 640px) {
+    .filters-grid {
+      gap: 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .filters-grid.admin-filters {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .filters-grid.regular-filters {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
   /* Mobile-friendly table */
   .table-responsive {
     @apply overflow-x-auto -mx-4 xs:mx-0;
@@ -89,6 +132,93 @@
 
   .alert-info {
     @apply bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-700;
+  }
+
+  /* Sidebar toggle animations */
+  .sidebar-collapsed {
+    @apply w-16;
+  }
+
+  .sidebar-expanded {
+    @apply w-64;
+  }
+
+  .sidebar-nav-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-nav-item:hover {
+    transform: translateX(2px);
+  }
+
+  .sidebar-collapsed .sidebar-nav-item:hover {
+    transform: translateX(0) scale(1.05);
+  }
+
+  .sidebar-brand-collapsed {
+    @apply justify-center px-2;
+  }
+
+  .sidebar-text-fade {
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .sidebar-collapsed .sidebar-text-fade {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Stats toggle animations */
+  .stats-collapse-enter {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+
+  .stats-collapse-enter-active {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .stats-collapse-exit {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+
+  .stats-collapse-exit-active {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Enhanced card hover effects */
+  .stats-card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .stats-card-hover:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark .stats-card-hover:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4),
+      0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Stats toggle button styling */
+  .stats-toggle {
+    @apply flex items-center justify-center p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500;
+  }
+
+  /* Filter container styling */
+  .filter-container {
+    @apply space-y-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700;
   }
 }
 
@@ -188,5 +318,28 @@
 
   .role-admin-primary {
     @apply bg-purple-600 hover:bg-purple-700 text-white;
+  }
+
+  /* Custom scrollbar for webkit browsers */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(156 163 175);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(107 114 128);
   }
 }

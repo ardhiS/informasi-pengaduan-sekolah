@@ -81,9 +81,9 @@ export const AuthProvider = ({ children }) => {
         password,
       };
 
-      console.log('📤 Sending to /api/authentications:', requestData);
+      console.log('📤 Sending to /authentications:', requestData);
 
-      const response = await api.post('/api/authentications', requestData);
+      const response = await api.post('/authentications', requestData);
 
       console.log('✅ Login response:', response.data);
 
@@ -147,7 +147,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (refreshToken) {
-        await api.delete('/api/authentications', {
+        await api.delete('/authentications', {
           data: { refreshToken },
         });
       }

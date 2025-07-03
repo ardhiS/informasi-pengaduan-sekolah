@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Menu, Bell, User, LogOut, ChevronDown } from 'lucide-react';
+import {
+  Menu,
+  Bell,
+  User,
+  LogOut,
+  ChevronDown,
+  PanelLeftClose,
+  PanelLeft,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useTranslation } from '../../utils/translations';
@@ -8,7 +16,7 @@ import { getRoleBadgeColor } from '../../utils/roleColors';
 import AtThahirinLogo from '../AtThahirinLogo';
 import ThemeLanguageToggle from '../ThemeLanguageToggle';
 
-const Header = ({ onMenuClick }) => {
+const Header = ({ onMenuClick, onToggleSidebar, sidebarCollapsed }) => {
   const { user, logout } = useAuth();
   const { isDarkMode, language } = useTheme();
   const { t } = useTranslation(language);
@@ -71,6 +79,7 @@ const Header = ({ onMenuClick }) => {
         <div className='flex justify-between items-center h-12 xs:h-14 sm:h-16'>
           {/* Left side - Menu button and logo/title */}
           <div className='flex items-center min-w-0 flex-1'>
+            {/* Mobile menu button */}
             <button
               type='button'
               className={`md:hidden btn-icon ${
@@ -82,6 +91,29 @@ const Header = ({ onMenuClick }) => {
             >
               <Menu className='h-5 w-5' />
             </button>
+
+            {/* Desktop sidebar toggle button */}
+            <button
+              type='button'
+              className={`hidden md:block btn-icon ${
+                isDarkMode
+                  ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-800'
+                  : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
+              } focus:ring-primary-500 mr-2 xs:mr-3`}
+              onClick={onToggleSidebar}
+              title={
+                sidebarCollapsed
+                  ? t('expandSidebar', 'Expand Sidebar')
+                  : t('collapseSidebar', 'Collapse Sidebar')
+              }
+            >
+              {sidebarCollapsed ? (
+                <PanelLeft className='h-5 w-5' />
+              ) : (
+                <PanelLeftClose className='h-5 w-5' />
+              )}
+            </button>
+
             <div className='flex-shrink-0 flex items-center min-w-0'>
               <AtThahirinLogo className='w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 flex-shrink-0' />
               {/* Hide title on mobile, show only on larger screens */}

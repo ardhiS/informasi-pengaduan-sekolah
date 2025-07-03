@@ -7,6 +7,19 @@ import Header from './Header';
 const Layout = ({ children }) => {
   const { isDarkMode } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    // Load sidebar state from localStorage
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+
+  // Save sidebar collapsed state to localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      'sidebarCollapsed',
+      JSON.stringify(isSidebarCollapsed)
+    );
+  }, [isSidebarCollapsed]);
 
   // Close sidebar when screen size changes to desktop
   useEffect(() => {
@@ -28,12 +41,20 @@ const Layout = ({ children }) => {
       }`}
     >
       {/* Sidebar */}
-      <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+      <Sidebar
+        open={sidebarOpen}
+        setOpen={setSidebarOpen}
+        isCollapsed={isSidebarCollapsed}
+      />
 
       {/* Main content */}
       <div className='flex flex-col flex-1 overflow-hidden min-w-0'>
         {/* Header */}
-        <Header onMenuClick={() => setSidebarOpen(true)} />
+        <Header
+          onMenuClick={() => setSidebarOpen(true)}
+          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          sidebarCollapsed={isSidebarCollapsed}
+        />
 
         {/* Page content */}
         <main

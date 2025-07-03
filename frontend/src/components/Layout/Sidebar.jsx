@@ -15,7 +15,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useTranslation } from '../../utils/translations';
 import AtThahirinLogo from '../AtThahirinLogo';
 
-const Sidebar = ({ open, setOpen }) => {
+const Sidebar = ({ open, setOpen, isCollapsed = false, setCollapsed }) => {
   const { isDarkMode, language } = useTheme();
   const { t } = useTranslation(language);
 
@@ -76,7 +76,11 @@ const Sidebar = ({ open, setOpen }) => {
 
       {/* Desktop sidebar */}
       <div className='hidden md:flex md:flex-shrink-0'>
-        <div className='flex flex-col w-64'>
+        <div
+          className={`flex flex-col transition-all duration-300 ease-in-out ${
+            isCollapsed ? 'w-16' : 'w-64'
+          }`}
+        >
           <div
             className={`flex flex-col flex-grow pt-5 pb-4 overflow-y-auto ${
               isDarkMode
@@ -84,7 +88,7 @@ const Sidebar = ({ open, setOpen }) => {
                 : 'bg-white border-gray-200'
             } border-r shadow-sm`}
           >
-            <SidebarContent />
+            <SidebarContent isCollapsed={isCollapsed} />
           </div>
         </div>
       </div>
@@ -92,7 +96,11 @@ const Sidebar = ({ open, setOpen }) => {
   );
 };
 
-const SidebarContent = ({ mobile = false, onNavigate }) => {
+const SidebarContent = ({
+  mobile = false,
+  isCollapsed = false,
+  onNavigate,
+}) => {
   const { isDarkMode, language } = useTheme();
   const { t } = useTranslation(language);
 
@@ -125,26 +133,31 @@ const SidebarContent = ({ mobile = false, onNavigate }) => {
           isDarkMode
             ? 'hover:bg-green-900/30 text-green-300'
             : 'hover:bg-green-50 text-green-800'
-        } transition-all duration-200 ease-in-out transform hover:scale-105 rounded-lg mx-2`}
+        } transition-all duration-200 ease-in-out transform hover:scale-105 rounded-lg mx-2 ${
+          isCollapsed ? 'justify-center' : ''
+        }`}
         onClick={handleNavigationClick}
+        title={isCollapsed ? 'SMP AT-THAHIRIN' : ''}
       >
-        <AtThahirinLogo className='h-8 w-8 transition-all duration-200 ease-in-out' />
-        <div className='ml-3 flex flex-col'>
-          <span
-            className={`text-sm font-bold leading-tight ${
-              isDarkMode ? 'text-green-300' : 'text-green-800'
-            }`}
-          >
-            SMP AT-THAHIRIN
-          </span>
-          <span
-            className={`text-xs leading-tight ${
-              isDarkMode ? 'text-green-400' : 'text-green-600'
-            }`}
-          >
-            {t('complaintSystem', 'Website Pengaduan')}
-          </span>
-        </div>
+        <AtThahirinLogo className='h-8 w-8 transition-all duration-200 ease-in-out flex-shrink-0' />
+        {!isCollapsed && (
+          <div className='ml-3 flex flex-col'>
+            <span
+              className={`text-sm font-bold leading-tight ${
+                isDarkMode ? 'text-green-300' : 'text-green-800'
+              }`}
+            >
+              SMP AT-THAHIRIN
+            </span>
+            <span
+              className={`text-xs leading-tight ${
+                isDarkMode ? 'text-green-400' : 'text-green-600'
+              }`}
+            >
+              {t('complaintSystem', 'Website Pengaduan')}
+            </span>
+          </div>
+        )}
       </NavLink>
 
       {/* Navigation */}
@@ -155,8 +168,11 @@ const SidebarContent = ({ mobile = false, onNavigate }) => {
               key={item.href}
               to={item.href}
               onClick={handleNavigationClick}
+              title={isCollapsed ? item.name : ''}
               className={({ isActive }) =>
                 `group flex items-center px-3 py-3 xs:py-2 text-sm xs:text-base font-medium rounded-md transition-all duration-200 ease-in-out touch-manipulation relative ${
+                  isCollapsed ? 'justify-center' : ''
+                } ${
                   isActive
                     ? isDarkMode
                       ? 'bg-primary-900/50 text-primary-200 border-r-4 border-primary-400'
@@ -168,15 +184,23 @@ const SidebarContent = ({ mobile = false, onNavigate }) => {
               }
             >
               <item.icon
-                className='mr-3 flex-shrink-0 h-5 w-5 xs:h-6 xs:w-6 transition-colors duration-200'
+                className='flex-shrink-0 h-5 w-5 xs:h-6 xs:w-6 transition-colors duration-200'
                 aria-hidden='true'
               />
-              <span className='truncate'>{item.name}</span>
-              {/* New badge for Pengaduan */}
-              {item.new && (
-                <span className='ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse'>
-                  {t('new', 'NEW')}
-                </span>
+              {!isCollapsed && (
+                <>
+                  <span className='ml-3 truncate'>{item.name}</span>
+                  {/* New badge for Pengaduan */}
+                  {item.new && (
+                    <span className='ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse'>
+                      {t('new', 'NEW')}
+                    </span>
+                  )}
+                </>
+              )}
+              {/* Show badge as dot when collapsed */}
+              {isCollapsed && item.new && (
+                <span className='absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse'></span>
               )}
             </NavLink>
           ))}

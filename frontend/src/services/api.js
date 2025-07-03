@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// Update this URL with your VS Code backend forwarded URL
-const BASE_URL = 'http://localhost:3000'; // Backend server port
+// Gunakan proxy yang sudah dikonfigurasi di vite.config.js
+// Frontend akan proxy request ke backend secara otomatis
+const BASE_URL = ''; // Empty karena menggunakan proxy Vite
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -13,12 +14,33 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    // Define public endpoints that don't need authentication
+    const publicEndpoints = [
+      '/complaints/all',
+      '/subjects/all',
+      '/classes/all',
+    ];
+
+    const isPublicEndpoint = publicEndpoints.some((endpoint) =>
+      config.url?.includes(endpoint)
+    );
 
     console.log('🚀 API Request:', {
       url: config.url,
       method: config.method,
       data: config.data,
+      isPublic: isPublicEndpoint,
+    });
+
+    // Skip token check for public endpoints
+    if (isPublicEndpoint) {
+      console.log('📖 Public endpoint, skipping auth');
+      return config;
+    }
+
+    const token = localStorage.getItem('accessToken');
+
+    console.log('🔐 Auth check:', {
       hasToken: !!token,
       tokenPreview: token ? token.substring(0, 50) + '...' : 'none',
     });
@@ -38,7 +60,7 @@ api.interceptors.request.use(
           });
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          window.location.href = '/login/siswa';
+          // Don't redirect immediately, let the response interceptor handle it
           return Promise.reject(new Error('Token expired'));
         }
 
@@ -123,7 +145,7 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
           console.log('🔄 Attempting token refresh...');
-          const response = await axios.put(`${BASE_URL}/api/authentications`, {
+          const response = await axios.put(`${BASE_URL}/authentications`, {
             refreshToken,
           });
 

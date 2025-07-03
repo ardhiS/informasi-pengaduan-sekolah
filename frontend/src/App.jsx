@@ -26,6 +26,7 @@ import Profile from './pages/Profile';
 import ApiTesting from './pages/ApiTesting';
 import SampleDataGenerator from './pages/SampleDataGenerator';
 import ProtectedRoute from './components/ProtectedRoute';
+import FlexibleRoute from './components/FlexibleRoute';
 
 function App() {
   return (
@@ -69,11 +70,11 @@ function App() {
                 <Route
                   path='/complaints'
                   element={
-                    <ProtectedRoute>
+                    <FlexibleRoute allowPublic={true}>
                       <Layout>
                         <Complaints />
                       </Layout>
-                    </ProtectedRoute>
+                    </FlexibleRoute>
                   }
                 />
                 <Route
@@ -129,11 +130,11 @@ function App() {
                 <Route
                   path='/sample-data'
                   element={
-                    <ProtectedRoute>
+                    <FlexibleRoute allowPublic={true}>
                       <Layout>
                         <SampleDataGenerator />
                       </Layout>
-                    </ProtectedRoute>
+                    </FlexibleRoute>
                   }
                 />
                 {/* Keep old welcome as backup */}
