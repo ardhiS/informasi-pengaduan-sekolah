@@ -1,82 +1,140 @@
 /* Font Inter */
 body {
-	font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
 }
 
 /* CSS bikin sendiri - Halaman Login */
 .kotak-login {
-	max-width: 450px;
-	margin: 2rem auto;
-	border: none;
-	border-radius: 0.75rem;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 450px;
+  margin: 2rem auto;
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .logo-login {
-	width: 80px;
-	height: auto;
+  width: 80px;
+  height: auto;
 }
 
 /* Custom CSS Button dari Boostrap */
 .btn-info {
-	background-color: #0dcaf0 !important;
-	border-color: #0dcaf0 !important;
-	color: white !important;
+  background-color: #0dcaf0 !important;
+  border-color: #0dcaf0 !important;
+  color: white !important;
 }
 
 .btn-info:hover {
-	background-color: #0bb5d3 !important;
-	border-color: #0bb5d3 !important;
-	color: white !important;
+  background-color: #0bb5d3 !important;
+  border-color: #0bb5d3 !important;
+  color: white !important;
 }
 
 .btn-outline-info {
-	color: #0dcaf0 !important;
-	border-color: #0dcaf0 !important;
+  color: #0dcaf0 !important;
+  border-color: #0dcaf0 !important;
 }
 
 .btn-outline-info:hover {
-	background-color: #0dcaf0 !important;
-	border-color: #0dcaf0 !important;
-	color: white !important;
+  background-color: #0dcaf0 !important;
+  border-color: #0dcaf0 !important;
+  color: white !important;
 }
 
 /* Custom CSS Alert dari Boostrap - Halaman Beranda */
 .alert-success-custom {
-	background-color: #d1e7dd;
-	border-color: #badbcc;
-	color: #0f5132;
+  background-color: #d1e7dd;
+  border-color: #badbcc;
+  color: #0f5132;
 }
 
 .alert-success-custom .shield-icon {
-	color: #198754;
+  color: #198754;
 }
 
 .alert-success-custom .link-custom {
-	color: #0f5132;
+  color: #0f5132;
 }
 
 /* CSS bikin sendiri Text Logo Gradient -  Halaman Beranda */
 .text-logo-gradient {
-	background: linear-gradient(135deg, #0dcaf0 0%, #198754 100%);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
+  background: linear-gradient(135deg, #0dcaf0 0%, #198754 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Custom CSS Alert dari Boostrap - Halaman Login */
 .alert-login {
-	max-width: 450px;
-	background-color: #d1e7dd;
-	border-color: #badbcc;
-	color: #0f5132;
+  max-width: 450px;
+  background-color: #d1e7dd;
+  border-color: #badbcc;
+  color: #0f5132;
 }
 
 .alert-login .shield-icon-login {
-	color: #198754;
+  color: #198754;
 }
 
 .alert-login .link-login {
-	color: #0f5132;
+  color: #0f5132;
+}
+
+/* Custom CSS Radio Card dengan Bootstrap Dark Mode - CategoryPage */
+
+/* 
+* Untuk membuat dark mode dan light mode:
+* 1. Gunakan CSS variable dari Bootstrap (--bs-*) yang sudah support dark mode
+* 2. Bootstrap akan otomatis mengganti value variable saat mode berubah
+* 3. Contoh variable yang digunakan:
+*    - Light mode: --bs-info: #0dcaf0
+*    - Dark mode: --bs-info: #6edff6
+*/
+
+.radio-card {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* 
+* Hover effect menggunakan variable --bs-info yang akan berubah
+* sesuai dengan mode yang aktif (light/dark)
+*/
+.radio-card:hover {
+  border-color: var(--bs-info) !important;
+  box-shadow: 0 4px 12px rgba(var(--bs-info-rgb), 0.15);
+  transform: translateY(-2px);
+}
+
+.radio-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* 
+* Warna teks label akan menyesuaikan dengan --bs-info
+* pada mode light/dark yang aktif
+*/
+.radio-card input[type="radio"]:checked + .radio-label {
+  color: var(--bs-info) !important;
+}
+
+/*
+* Background dan border akan otomatis berubah menggunakan
+* --bs-info dan --bs-info-bg-subtle sesuai mode yang aktif
+*/
+.radio-card:has(input[type="radio"]:checked) {
+  border-color: var(--bs-info) !important;
+  background-color: var(--bs-info-bg-subtle) !important;
+  box-shadow: 0 4px 16px rgba(var(--bs-info-rgb), 0.2);
+}
+
+.radio-label {
+  cursor: pointer;
+  margin: 0;
+  width: 100%;
+  display: block;
 }
