@@ -1,12 +1,20 @@
 import React from "react";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
-import ComplaintDetailsPage from "../pages/ComplaintDetailsPage";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-export default function ComplaintApp() {
+import Navbar from "./Navbar";
+import HomePage from "../pages/HomePage";
+import CategoriesPage from "../pages/complaints/CategoriesPage";
+import Footer from "./Footer";
+import ComplaintDetailsPage from "../pages/complaints/ComplaintDetailsPage";
+
+export default function ComplaintApp({ toggleTheme }) {
 	return (
 		<>
-			<ComplaintDetailsPage />
+			<Navbar searchField logOutButton onToggleTheme={toggleTheme} />
+			<Routes>
+				<Route path="/" element={<HomePage />} />
+				<Route path="/category" element={<CategoriesPage />} />
+			</Routes>
 			<Footer />
 		</>
 	);

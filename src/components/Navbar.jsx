@@ -1,6 +1,6 @@
 import React from "react";
-import favicon from "../assets/images/favicon-64x64.png";
 import { BsSearch, BsGlobe, BsGeoAltFill, BsMoonStars } from "react-icons/bs";
+import favicon from "../assets/images/favicon-64x64.png";
 
 export default function Navbar({ searchField, logOutButton, onToggleTheme }) {
 	return (

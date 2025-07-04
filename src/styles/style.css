@@ -80,3 +80,61 @@ body {
 .alert-login .link-login {
 	color: #0f5132;
 }
+
+/* Custom CSS Radio Card dengan Bootstrap Dark Mode - CategoryPage */
+
+/* 
+* Untuk membuat dark mode dan light mode:
+* 1. Gunakan CSS variable dari Bootstrap (--bs-*) yang sudah support dark mode
+* 2. Bootstrap akan otomatis mengganti value variable saat mode berubah
+* 3. Contoh variable yang digunakan:
+*    - Light mode: --bs-info: #0dcaf0
+*    - Dark mode: --bs-info: #6edff6
+*/
+
+.radio-card {
+	position: relative;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+/* 
+* Hover effect menggunakan variable --bs-info yang akan berubah
+* sesuai dengan mode yang aktif (light/dark)
+*/
+.radio-card:hover {
+	border-color: var(--bs-info) !important;
+	box-shadow: 0 4px 12px rgba(var(--bs-info-rgb), 0.15);
+	transform: translateY(-2px);
+}
+
+.radio-card input[type="radio"] {
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+}
+
+/* 
+* Warna teks label akan menyesuaikan dengan --bs-info
+* pada mode light/dark yang aktif
+*/
+.radio-card input[type="radio"]:checked + .radio-label {
+	color: var(--bs-info) !important;
+}
+
+/*
+* Background dan border akan otomatis berubah menggunakan
+* --bs-info dan --bs-info-bg-subtle sesuai mode yang aktif
+*/
+.radio-card:has(input[type="radio"]:checked) {
+	border-color: var(--bs-info) !important;
+	background-color: var(--bs-info-bg-subtle) !important;
+	box-shadow: 0 4px 16px rgba(var(--bs-info-rgb), 0.2);
+}
+
+.radio-label {
+	cursor: pointer;
+	margin: 0;
+	width: 100%;
+	display: block;
+}

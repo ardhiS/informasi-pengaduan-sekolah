@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 import {
 	BsCheckCircleFill,
 	BsPlusCircleFill,
@@ -7,7 +7,15 @@ import {
 	BsShieldFillCheck,
 } from "react-icons/bs";
 
-export default function HomePage() {
+import Navbar from "../components/Navbar";
+
+function HomePage() {
+	const navigate = useNavigate();
+
+	const handleCreateComplaint = () => {
+		navigate("/category");
+	};
+
 	return (
 		<>
 			<main className="container my-5">
@@ -47,7 +55,7 @@ export default function HomePage() {
 						</div>
 
 						{/* <!-- Card panduan pelaporan --> */}
-						<div className="card border-0 bg-body-secondary mt-4">
+						<div className="card border-0 bg-body mt-4">
 							<div className="card-body p-4">
 								<h3
 									className="card-title mb-4 fs-3 fw-bold text-info"
@@ -68,7 +76,7 @@ export default function HomePage() {
 											className="text-muted"
 											data-lang-id="Sampaikan secara rinci—ceritakan kejadian, waktu, dan pihak yang terlibat sejelas mungkin">
 											<strong
-												className="fw-bold text-dark"
+												className="fw-bold text-body"
 												data-lang-id="Isi laporan dengan jujur">
 												Isi laporan dengan jujur:
 											</strong>
@@ -80,7 +88,7 @@ export default function HomePage() {
 										<BsCheckCircleFill className="text-success" />
 										<span data-lang-id="Gunakan bahasa yang sopan dan jelas">
 											<strong
-												className="fw-bold text-dark"
+												className="fw-bold text-body"
 												data-lang-id="Isi laporan dengan jujur">
 												Gunakan bahasa yang sopan dan jelas
 											</strong>
@@ -107,12 +115,15 @@ export default function HomePage() {
 
 						{/* <!-- Tombol aksi --> */}
 						<div className="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-							<a
-								href="#"
-								className="btn btn-info btn-lg px-4 d-flex align-items-center gap-2">
+							<button
+								onClick={handleCreateComplaint}
+								className="btn btn-info btn-lg px-4 d-flex align-items-center gap-2"
+								type="button">
 								<BsPlusCircleFill />
+
 								<span data-lang-id="Buat Pengaduan">Buat Pengaduan</span>
-							</a>
+							</button>
+
 							<a
 								href="#"
 								className="btn btn-outline-info btn-lg px-4 d-flex align-items-center gap-2">
@@ -125,7 +136,7 @@ export default function HomePage() {
 						<div className="d-flex justify-content-center mt-4">
 							<div className="alert alert-success alert-success-custom d-flex align-items-center">
 								<div className="small d-flex align-items-center">
-									<BsShieldFillCheck className="text-success me-2" />
+									<BsShieldFillCheck className="text-success me-1" />
 									<strong data-lang-id="Semua komunikasi bersifat anonim dan dienkripsi">
 										Semua komunikasi bersifat anonim dan dienkripsi{" "}
 									</strong>
@@ -145,3 +156,5 @@ export default function HomePage() {
 		</>
 	);
 }
+
+export default HomePage;
