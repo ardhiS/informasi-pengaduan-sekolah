@@ -646,7 +646,17 @@ class ComplaintsHandler {
       // Check if service exists
       if (!this._service) {
         console.error('❌ Service is not initialized');
-        throw new Error('Service not initialized');
+        return h
+          .response({
+            status: 'error',
+            message: 'Service not initialized',
+            data: {
+              complaints: [],
+              total: 0,
+            },
+            complaints: [],
+          })
+          .code(500);
       }
 
       console.log('📞 Calling service.getComplaints...');
@@ -655,29 +665,33 @@ class ComplaintsHandler {
 
       console.log('✅ Got complaints:', complaints ? complaints.length : 0);
 
-      return h.response({
+      const response = {
         status: 'success',
         data: {
-          complaints,
-          total: complaints.length,
+          complaints: complaints || [],
+          total: complaints ? complaints.length : 0,
         },
-        complaints, // Also include at root level for compatibility
-      });
+        complaints: complaints || [], // Also include at root level for compatibility
+      };
+
+      return h.response(response).code(200);
     } catch (error) {
       console.error('❌ Error in getAllComplaintsHandler:', error);
       console.error('❌ Error stack:', error.stack);
-      const response = h.response({
+
+      const errorResponse = {
         status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-        error: error.message, // Add error message for debugging
+        message: 'Failed to fetch complaints',
+        error:
+          process.env.NODE_ENV === 'development' ? error.message : undefined,
         data: {
           complaints: [],
           total: 0,
         },
         complaints: [], // Return empty array on error
-      });
-      response.code(500);
-      return response;
+      };
+
+      return h.response(errorResponse).code(500);
     }
   }
 

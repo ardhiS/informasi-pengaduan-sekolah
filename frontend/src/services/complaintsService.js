@@ -1,9 +1,27 @@
-import api from './api'; // Gunakan API instance yang sudah dikonfigurasi
+import axios from 'axios';
+import {
+  API_CONFIG,
+  API_ENDPOINTS,
+  COMPLAINT_STATUS,
+  COMPLAINT_PRIORITY,
+  COMPLAINT_CATEGORIES,
+  STORAGE_KEYS,
+} from '../constants';
+import { logger, errorHandler, storage } from '../utils/helpers';
+
+const BASE_URL = import.meta.env.DEV ? '' : API_CONFIG.BASE_URL;
+
+function getAuthHeaders() {
+  const token = storage.get(STORAGE_KEYS.ACCESS_TOKEN);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 class ComplaintsService {
   // Create new complaint
   async create(complaintData) {
     try {
+      logger.info('Creating new complaint:', complaintData);
+
       // Use FormData for multipart/form-data with image support
       const formData = new FormData();
 
@@ -33,14 +51,20 @@ class ComplaintsService {
         });
       }
 
-      const response = await api.post('/complaints', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axios.post(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}`,
+        formData,
+        {
+          headers: {
+            ...getAuthHeaders(),
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      logger.success('Complaint created successfully');
       return response.data;
     } catch (error) {
-      console.error('Error creating complaint:', error);
+      logger.error('Error creating complaint:', error);
       throw error;
     }
   }
@@ -48,65 +72,79 @@ class ComplaintsService {
   // Get all complaints with filters
   async getAll(filters = {}) {
     try {
+      console.log('📡 complaintsService.getAll called with filters:', filters);
+      logger.debug('Fetching complaints with filters:', filters);
+
+      // Build query parameters
       const params = new URLSearchParams();
-
-      if (filters.status) params.append('status', filters.status);
-      if (filters.category) params.append('category', filters.category);
-      if (filters.priority) params.append('priority', filters.priority);
-      if (filters.limit) params.append('limit', filters.limit);
-      if (filters.offset) params.append('offset', filters.offset);
-
-      // Try authenticated endpoint first
-      try {
-        const response = await api.get(`/complaints?${params.toString()}`);
-        return response.data.data.complaints; // Backend returns {status: 'success', data: {complaints: [...], user_info: {...}}}
-      } catch (authError) {
-        // If authentication fails (401, 403), check if token expired
-        if (
-          authError.response &&
-          [401, 403].includes(authError.response.status)
-        ) {
-          console.log('Authentication failed, checking if token expired...');
-
-          // Check if message indicates token issue
-          const errorMessage = authError.response?.data?.message || '';
-          if (
-            errorMessage.includes('token') ||
-            errorMessage.includes('expired')
-          ) {
-            console.log('Token expired, redirecting to login...');
-            // Clear tokens and redirect
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            window.location.href = '/login/siswa';
-            return [];
-          }
-
-          // Try public endpoint as fallback
-          console.log('Trying public endpoint...');
-          const publicResponse = await api.get('/complaints/all');
-          return (
-            publicResponse.data.data.complaints ||
-            publicResponse.data.complaints ||
-            []
-          );
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          params.append(key, value);
         }
-        // Re-throw other errors
-        throw authError;
+      });
+
+      // Try authenticated endpoint first, fallback to public if needed
+      try {
+        console.log('🔐 Trying authenticated endpoint...');
+        const response = await axios.get(
+          `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}?${params.toString()}`,
+          { headers: getAuthHeaders() }
+        );
+        logger.debug('Authenticated complaints response:', response);
+        console.log('✅ Authenticated endpoint successful, returning data');
+        return response.data.data?.complaints || response.data.complaints || [];
+      } catch (authError) {
+        console.log(
+          '⚠️ Authenticated endpoint failed, trying public endpoint...'
+        );
+        logger.warn(
+          'Authenticated endpoint failed, trying public endpoint:',
+          authError
+        );
+
+        // Fallback to public endpoint
+        const response = await axios.get(
+          `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.PUBLIC}?${params.toString()}`
+        );
+        logger.debug('Public complaints response:', response);
+        console.log('✅ Public endpoint successful, returning data');
+        return response.data.data?.complaints || response.data.complaints || [];
       }
     } catch (error) {
-      console.error('Error fetching complaints:', error);
+      console.error('❌ complaintsService.getAll error:', error);
+      logger.error('Error fetching complaints:', error);
       throw error;
+    }
+  }
+
+  // Helper method to get public complaints
+  async getPublicComplaints() {
+    try {
+      logger.debug('Fetching public complaints...');
+      const publicResponse = await axios.get(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.PUBLIC}`
+      );
+      return (
+        publicResponse.data.data?.complaints ||
+        publicResponse.data.complaints ||
+        []
+      );
+    } catch (publicError) {
+      logger.error('Public endpoint failed:', publicError);
+      return [];
     }
   }
 
   // Get complaint by ID
   async getById(id) {
     try {
-      const response = await api.get(`/complaints/${id}`);
+      const response = await axios.get(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/${id}`,
+        { headers: getAuthHeaders() }
+      );
       return response.data.data.complaint; // Backend returns {status: 'success', data: {complaint: {...}}}
     } catch (error) {
-      console.error('Error fetching complaint:', error);
+      logger.error('Error fetching complaint:', error);
       throw error;
     }
   }
@@ -133,10 +171,14 @@ class ComplaintsService {
         }
       });
 
-      const response = await api.put(`/complaints/${id}`, filteredData);
+      const response = await axios.put(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/${id}`,
+        filteredData,
+        { headers: getAuthHeaders() }
+      );
       return response.data;
     } catch (error) {
-      console.error('Error updating complaint:', error);
+      logger.error('Error updating complaint:', error);
       throw error;
     }
   }
@@ -144,10 +186,13 @@ class ComplaintsService {
   // Delete complaint
   async delete(id) {
     try {
-      const response = await api.delete(`/complaints/${id}`);
+      const response = await axios.delete(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/${id}`,
+        { headers: getAuthHeaders() }
+      );
       return response.data;
     } catch (error) {
-      console.error('Error deleting complaint:', error);
+      logger.error('Error deleting complaint:', error);
       throw error;
     }
   }
@@ -155,64 +200,83 @@ class ComplaintsService {
   // Get complaint statistics
   async getStats() {
     try {
+      logger.debug('Fetching complaint statistics...');
+
       // Try authenticated endpoint first
       try {
-        const response = await api.get('/complaints/stats');
-        return response.data.data.stats;
+        const response = await axios.get(
+          `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.STATS}`,
+          { headers: getAuthHeaders() }
+        );
+        logger.debug('Authenticated stats response:', response);
+        return response.data.data?.stats || response.data.stats || {};
       } catch (authError) {
-        // If authentication fails, return basic stats from public endpoint
-        if (
-          authError.response &&
-          [401, 403].includes(authError.response.status)
-        ) {
-          console.log(
-            'Authentication failed for stats, returning basic stats...'
-          );
-          const publicResponse = await api.get('/complaints/all');
-          const complaints =
-            publicResponse.data.data.complaints ||
-            publicResponse.data.complaints ||
-            [];
-
-          // Calculate basic stats from public data
-          const basicStats = {
-            total: complaints.length,
-            byStatus: {},
-            byCategory: {},
-            byPriority: {},
-            recent: complaints.filter((c) => {
-              const createdDate = new Date(c.reported_at || c.created_at);
-              const weekAgo = new Date();
-              weekAgo.setDate(weekAgo.getDate() - 7);
-              return createdDate >= weekAgo;
-            }).length,
-          };
-
-          complaints.forEach((complaint) => {
-            // Count by status
-            const status = complaint.status || 'pending';
-            basicStats.byStatus[status] =
-              (basicStats.byStatus[status] || 0) + 1;
-
-            // Count by category
-            const category = complaint.category || 'lainnya';
-            basicStats.byCategory[category] =
-              (basicStats.byCategory[category] || 0) + 1;
-
-            // Count by priority
-            const priority = complaint.priority || 'medium';
-            basicStats.byPriority[priority] =
-              (basicStats.byPriority[priority] || 0) + 1;
-          });
-
-          return basicStats;
-        }
-        // Re-throw other errors
-        throw authError;
+        logger.warn(
+          'Authentication failed for stats, using basic calculation:',
+          authError
+        );
+        // Fallback to basic stats calculation
+        return this.calculateBasicStats();
       }
     } catch (error) {
-      console.error('Error fetching complaint stats:', error);
-      throw error;
+      logger.error('Error fetching complaint stats:', error);
+      // Return basic stats instead of throwing
+      return this.calculateBasicStats();
+    }
+  }
+
+  // Helper method to calculate basic stats from public data
+  async calculateBasicStats() {
+    try {
+      const publicResponse = await axios.get(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.PUBLIC}`
+      );
+      const complaints =
+        publicResponse.data.data?.complaints ||
+        publicResponse.data.complaints ||
+        [];
+
+      // Calculate basic stats from public data
+      const basicStats = {
+        total: complaints.length,
+        byStatus: {},
+        byCategory: {},
+        byPriority: {},
+        recent: complaints.filter((c) => {
+          const createdDate = new Date(c.reported_at || c.created_at);
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return createdDate >= weekAgo;
+        }).length,
+      };
+
+      complaints.forEach((complaint) => {
+        // Count by status
+        const status = complaint.status || 'pending';
+        basicStats.byStatus[status] = (basicStats.byStatus[status] || 0) + 1;
+
+        // Count by category
+        const category = complaint.category || 'lainnya';
+        basicStats.byCategory[category] =
+          (basicStats.byCategory[category] || 0) + 1;
+
+        // Count by priority
+        const priority = complaint.priority || 'medium';
+        basicStats.byPriority[priority] =
+          (basicStats.byPriority[priority] || 0) + 1;
+      });
+
+      return basicStats;
+    } catch (error) {
+      logger.error('Error calculating basic stats:', error);
+      // Return empty stats object
+      return {
+        total: 0,
+        byStatus: {},
+        byCategory: {},
+        byPriority: {},
+        recent: 0,
+      };
     }
   }
 
@@ -230,26 +294,65 @@ class ComplaintsService {
     ];
   }
 
-  // Get priorities
+  // Get priorities using constants
   getPriorities() {
-    return [
-      { value: 'low', label: 'Rendah', color: 'gray' },
-      { value: 'medium', label: 'Sedang', color: 'yellow' },
-      { value: 'high', label: 'Tinggi', color: 'orange' },
-      { value: 'urgent', label: 'Mendesak', color: 'red' },
-    ];
+    return Object.values(COMPLAINT_PRIORITY).map((priority) => ({
+      value: priority,
+      label: this.getPriorityLabel(priority),
+      color: this.getPriorityColor(priority),
+    }));
   }
 
-  // Get statuses
+  // Get statuses using constants
   getStatuses() {
-    return [
-      { value: 'pending_approval', label: 'Pending Approval', color: 'yellow' },
-      { value: 'approved', label: 'Approved', color: 'green' },
-      { value: 'rejected', label: 'Rejected', color: 'red' },
-      { value: 'in_progress', label: 'In Progress', color: 'blue' },
-      { value: 'resolved', label: 'Resolved', color: 'green' },
-      { value: 'closed', label: 'Closed', color: 'gray' },
-    ];
+    return Object.values(COMPLAINT_STATUS).map((status) => ({
+      value: status,
+      label: this.getStatusLabel(status),
+      color: this.getStatusColor(status),
+    }));
+  }
+
+  // Helper methods for labels and colors
+  getPriorityLabel(priority) {
+    const labels = {
+      [COMPLAINT_PRIORITY.LOW]: 'Rendah',
+      [COMPLAINT_PRIORITY.MEDIUM]: 'Sedang',
+      [COMPLAINT_PRIORITY.HIGH]: 'Tinggi',
+      [COMPLAINT_PRIORITY.URGENT]: 'Mendesak',
+    };
+    return labels[priority] || priority;
+  }
+
+  getPriorityColor(priority) {
+    const colors = {
+      [COMPLAINT_PRIORITY.LOW]: 'gray',
+      [COMPLAINT_PRIORITY.MEDIUM]: 'yellow',
+      [COMPLAINT_PRIORITY.HIGH]: 'orange',
+      [COMPLAINT_PRIORITY.URGENT]: 'red',
+    };
+    return colors[priority] || 'gray';
+  }
+
+  getStatusLabel(status) {
+    const labels = {
+      [COMPLAINT_STATUS.PENDING]: 'Pending',
+      [COMPLAINT_STATUS.IN_PROGRESS]: 'In Progress',
+      [COMPLAINT_STATUS.RESOLVED]: 'Resolved',
+      [COMPLAINT_STATUS.CLOSED]: 'Closed',
+      [COMPLAINT_STATUS.REJECTED]: 'Rejected',
+    };
+    return labels[status] || status;
+  }
+
+  getStatusColor(status) {
+    const colors = {
+      [COMPLAINT_STATUS.PENDING]: 'yellow',
+      [COMPLAINT_STATUS.IN_PROGRESS]: 'blue',
+      [COMPLAINT_STATUS.RESOLVED]: 'green',
+      [COMPLAINT_STATUS.CLOSED]: 'gray',
+      [COMPLAINT_STATUS.REJECTED]: 'red',
+    };
+    return colors[status] || 'gray';
   }
 
   // Get reporter types
@@ -265,10 +368,15 @@ class ComplaintsService {
   // Approve complaint (admin only)
   async approve(id) {
     try {
-      const response = await api.put(`/complaints/${id}/approve`);
+      const response = await axios.put(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/${id}/approve`,
+        {},
+        { headers: getAuthHeaders() }
+      );
+      logger.success('Complaint approved successfully');
       return response.data;
     } catch (error) {
-      console.error('Error approving complaint:', error);
+      logger.error('Error approving complaint:', error);
       throw error;
     }
   }
@@ -276,10 +384,15 @@ class ComplaintsService {
   // Reject complaint (admin only)
   async reject(id, reason) {
     try {
-      const response = await api.put(`/complaints/${id}/reject`, { reason });
+      const response = await axios.put(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/${id}/reject`,
+        { reason },
+        { headers: getAuthHeaders() }
+      );
+      logger.success('Complaint rejected successfully');
       return response.data;
     } catch (error) {
-      console.error('Error rejecting complaint:', error);
+      logger.error('Error rejecting complaint:', error);
       throw error;
     }
   }
@@ -287,13 +400,15 @@ class ComplaintsService {
   // Update complaint progress (guru and admin)
   async updateProgress(id, status, notes) {
     try {
-      const response = await api.put(`/complaints/${id}/progress`, {
-        status,
-        notes,
-      });
+      const response = await axios.put(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/${id}/progress`,
+        { status, notes },
+        { headers: getAuthHeaders() }
+      );
+      logger.success('Complaint progress updated successfully');
       return response.data;
     } catch (error) {
-      console.error('Error updating complaint progress:', error);
+      logger.error('Error updating complaint progress:', error);
       throw error;
     }
   }
@@ -301,10 +416,13 @@ class ComplaintsService {
   // Get my complaints (user's own complaints)
   async getMy() {
     try {
-      const response = await api.get('/complaints/my');
+      const response = await axios.get(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/my`,
+        { headers: getAuthHeaders() }
+      );
       return response.data.data.complaints;
     } catch (error) {
-      console.error('Error fetching my complaints:', error);
+      logger.error('Error fetching my complaints:', error);
       throw error;
     }
   }
@@ -312,12 +430,70 @@ class ComplaintsService {
   // Get assigned complaints (for guru)
   async getAssigned() {
     try {
-      const response = await api.get('/complaints/assigned');
+      const response = await axios.get(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/assigned`,
+        { headers: getAuthHeaders() }
+      );
       return response.data.data.complaints;
     } catch (error) {
-      console.error('Error fetching assigned complaints:', error);
+      logger.error('Error fetching assigned complaints:', error);
       throw error;
     }
+  }
+
+  // Update complaint status
+  async updateStatus(id, newStatus) {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}${API_ENDPOINTS.COMPLAINTS.BASE}/${id}/status`,
+        { status: newStatus },
+        { headers: getAuthHeaders() }
+      );
+      logger.success('Complaint status updated successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error updating complaint status:', error);
+      throw error;
+    }
+  }
+
+  // Method aliases for compatibility with Complaints component
+  async getComplaints(filters = {}) {
+    console.log(
+      '🔍 complaintsService.getComplaints called with filters:',
+      filters
+    );
+    const complaints = await this.getAll(filters);
+    console.log(
+      '📋 complaintsService.getComplaints returning:',
+      complaints.length,
+      'complaints'
+    );
+    return { complaints };
+  }
+
+  async createComplaint(complaintData) {
+    return this.create(complaintData);
+  }
+
+  async updateComplaint(id, complaintData) {
+    return this.update(id, complaintData);
+  }
+
+  async deleteComplaint(id) {
+    return this.delete(id);
+  }
+
+  async approveComplaint(id) {
+    return this.approve(id);
+  }
+
+  async rejectComplaint(id, reason) {
+    return this.reject(id, reason);
+  }
+
+  async updateComplaintStatus(id, newStatus) {
+    return this.updateStatus(id, newStatus);
   }
 }
 

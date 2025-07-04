@@ -1,201 +1,128 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { jwtDecode } from 'jwt-decode';
-import api from '../services/api';
+import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-export { AuthContext };
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [accessToken, setAccessToken] = useState(
-    localStorage.getItem('accessToken')
-  );
-  const [refreshToken, setRefreshToken] = useState(
-    localStorage.getItem('refreshToken')
-  );
   const [loading, setLoading] = useState(true);
 
+  const accessToken = localStorage.getItem('accessToken');
+  const refreshToken = localStorage.getItem('refreshToken');
+
+  // Utility functions
+  const clearAuth = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  }, []);
+
+  const setAuthToken = useCallback((token) => {
+    if (token) {
+      localStorage.setItem('accessToken', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+  }, []);
+
+  const getUserFromToken = useCallback((token) => {
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.exp * 1000 < Date.now()) return null; // Token expired
+
+      return {
+        id: decoded.userId,
+        username: decoded.username,
+        fullname: decoded.fullname,
+        role: decoded.role || 'user',
+      };
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Initialize auth state
   useEffect(() => {
     if (accessToken) {
-      // Set default authorization header
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-      // Try to get user info
-      fetchUserProfile();
-    } else {
-      setLoading(false);
-    }
-  }, [accessToken]);
-
-  const fetchUserProfile = async () => {
-    try {
-      if (accessToken) {
-        // Decode JWT to get user info
-        try {
-          const decodedToken = jwtDecode(accessToken);
-          console.log('🔍 Restored token:', decodedToken);
-
-          // Check if token is expired
-          const isExpired = decodedToken.exp * 1000 < Date.now();
-          if (isExpired) {
-            console.warn('⚠️ Stored token is expired, clearing...');
-            logout();
-            return;
-          }
-
-          const userInfo = {
-            id: decodedToken.userId,
-            username: decodedToken.username,
-            fullname: decodedToken.fullname,
-            role: decodedToken.role || 'user',
-          };
-          setUser(userInfo);
-          console.log('Restored user info from token:', userInfo);
-        } catch (decodeError) {
-          console.error('Failed to decode stored token:', decodeError);
-          // Token might be invalid, logout
-          logout();
-        }
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error('Failed to fetch user profile:', error);
-      logout();
-    }
-  };
-
-  const login = async (username, password, role = null) => {
-    try {
-      console.log('🔐 Login attempt:', { username, password: '***', role });
-
-      const requestData = {
-        username,
-        password,
-      };
-
-      console.log('📤 Sending to /authentications:', requestData);
-
-      const response = await api.post('/authentications', requestData);
-
-      console.log('✅ Login response:', response.data);
-
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-        response.data.data;
-
-      setAccessToken(newAccessToken);
-      setRefreshToken(newRefreshToken);
-
-      localStorage.setItem('accessToken', newAccessToken);
-      localStorage.setItem('refreshToken', newRefreshToken);
-
-      api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-
-      // Decode JWT to get user info
-      try {
-        const decodedToken = jwtDecode(newAccessToken);
-        console.log('🔍 Decoded token:', decodedToken);
-
-        const userInfo = {
-          id: decodedToken.userId,
-          username: decodedToken.username || username,
-          fullname: decodedToken.fullname,
-          role: decodedToken.role || role || 'user',
-        };
+      const userInfo = getUserFromToken(accessToken);
+      if (userInfo) {
         setUser(userInfo);
-
-        // Store role for logout redirect
-        localStorage.setItem('lastRole', userInfo.role);
-
-        console.log('✅ User info set:', userInfo);
-        console.log('👤 Decoded user info:', userInfo);
-      } catch (decodeError) {
-        console.error('❌ Failed to decode token:', decodeError);
-        // Fallback to basic user info
-        setUser({ username, role: role || 'user' });
+        setAuthToken(accessToken);
+      } else {
+        clearAuth();
       }
-
-      return true; // Return boolean untuk compatibility
-    } catch (error) {
-      console.error('❌ Login failed:', error);
-      console.error('❌ Error response:', error.response?.data);
-      console.error('❌ Error status:', error.response?.status);
-      return false; // Return false untuk error
     }
-  };
+    setLoading(false);
+  }, [accessToken, getUserFromToken, setAuthToken, clearAuth]);
 
-  const register = async (userData) => {
-    try {
-      const response = await api.post('/auth/register', userData);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Registration failed:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Registration failed',
-      };
-    }
-  };
+  const login = useCallback(
+    async (username, password) => {
+      try {
+        const response = await axios.post('/api/authentications', {
+          username,
+          password,
+        });
+        const { accessToken: newToken, refreshToken: newRefresh } =
+          response.data.data;
 
-  const logout = async () => {
+        const userInfo = getUserFromToken(newToken);
+        if (!userInfo) throw new Error('Invalid token received');
+
+        setUser(userInfo);
+        setAuthToken(newToken);
+        localStorage.setItem('refreshToken', newRefresh);
+
+        return true;
+      } catch (error) {
+        console.error('Login failed:', error);
+        return false;
+      }
+    },
+    [getUserFromToken, setAuthToken]
+  );
+
+  const logout = useCallback(async () => {
     try {
       if (refreshToken) {
-        await api.delete('/authentications', {
-          data: { refreshToken },
-        });
+        await axios.delete('/api/authentications', { data: { refreshToken } });
       }
     } catch (error) {
       console.error('Logout request failed:', error);
     } finally {
-      // Clear user state and tokens
-      setUser(null);
-      setAccessToken(null);
-      setRefreshToken(null);
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('lastRole'); // Clear any cached role
-      delete api.defaults.headers.common['Authorization'];
+      clearAuth();
 
-      console.log('✅ Logout completed, user data cleared');
+      // Redirect logic
+      const currentPath = window.location.pathname;
+      if (currentPath === '/' || currentPath === '/welcome') return;
+
+      if (currentPath.includes('/admin')) {
+        window.location.href = '/login/admin';
+      } else if (currentPath.includes('/guru')) {
+        window.location.href = '/login/guru';
+      } else {
+        window.location.href = '/login/siswa';
+      }
     }
-  };
-
-  const refreshAccessToken = async () => {
-    try {
-      const response = await api.put('/authentications', {
-        refreshToken,
-      });
-
-      const { accessToken: newAccessToken } = response.data.data;
-      setAccessToken(newAccessToken);
-      localStorage.setItem('accessToken', newAccessToken);
-      api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-
-      return newAccessToken;
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      logout();
-      throw error;
-    }
-  };
+  }, [refreshToken, clearAuth]);
 
   const value = {
     user,
-    accessToken,
-    refreshToken,
     loading,
     login,
-    register,
     logout,
-    refreshAccessToken,
-    isAuthenticated: !!accessToken,
+    isAuthenticated: !!accessToken && !!user,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

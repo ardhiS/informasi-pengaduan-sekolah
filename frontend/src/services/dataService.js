@@ -1,98 +1,73 @@
-import api from './api';
-
-export const subjectsService = {
-  // GET /subjects/all (public endpoint for all subjects)
-  getAll: async () => {
-    const response = await api.get('/subjects/all');
-    return response.data;
-  },
-
-  // GET /subjects/{id}
-  getById: async (id) => {
-    const response = await api.get(`/subjects/${id}`);
-    return response.data;
-  },
-
-  // POST /subjects
-  create: async (subjectData) => {
-    const response = await api.post('/subjects', subjectData);
-    return response.data;
-  },
-
-  // PUT /subjects/{id}
-  update: async (id, subjectData) => {
-    const response = await api.put(`/subjects/${id}`, subjectData);
-    return response.data;
-  },
-
-  // DELETE /subjects/{id}
-  delete: async (id) => {
-    const response = await api.delete(`/subjects/${id}`);
-    return response.data;
-  },
-};
-
-export const classesService = {
-  // GET /classes/all (public endpoint for all classes)
-  getAll: async () => {
-    const response = await api.get('/classes/all');
-    return response.data;
-  },
-
-  // GET /classes/{id}
-  getById: async (id) => {
-    const response = await api.get(`/classes/${id}`);
-    return response.data;
-  },
-
-  // POST /classes
-  create: async (classData) => {
-    const response = await api.post('/classes', classData);
-    return response.data;
-  },
-
-  // PUT /classes/{id}
-  update: async (id, classData) => {
-    const response = await api.put(`/classes/${id}`, classData);
-    return response.data;
-  },
-
-  // DELETE /classes/{id}
-  delete: async (id) => {
-    const response = await api.delete(`/classes/${id}`);
-    return response.data;
-  },
-
-  // GET /classes/{id}/activities
-  getActivities: async (id) => {
-    const response = await api.get(`/classes/${id}/activities`);
-    return response.data;
-  },
-
-  // GET /classes/{id}/collaborations
-  getCollaborations: async (id) => {
-    const response = await api.get(`/classes/${id}/collaborations`);
-    return response.data;
-  },
-};
+import axios from 'axios';
+import { API_ENDPOINTS } from '../constants';
+import { logger, errorHandler } from '../utils/helpers';
 
 export const usersService = {
-  // GET /users/all (public endpoint for all users)
+  // GET /api/users/all (public endpoint for all users)
   getAll: async () => {
-    const response = await api.get('/users/all');
-    return response.data;
+    try {
+      logger.debug('Fetching all users...');
+      const response = await axios.get(API_ENDPOINTS.USERS.ALL);
+      logger.debug('Users fetched successfully:', response);
+      return response.data;
+    } catch (error) {
+      logger.error('Error fetching users:', error);
+      throw error;
+    }
   },
 
-  // GET /users/{id}
+  // GET /api/users/{id}
   getById: async (id) => {
-    const response = await api.get(`/users/${id}`);
-    return response.data;
+    try {
+      logger.debug('Fetching user by ID:', id);
+      const response = await axios.get(`${API_ENDPOINTS.USERS.BASE}/${id}`);
+      return response.data;
+    } catch (error) {
+      logger.error('Error fetching user by ID:', error);
+      throw error;
+    }
   },
 
-  // PUT /users/{id}
+  // PUT /api/users/{id}
   update: async (id, userData) => {
-    const response = await api.put(`/users/${id}`, userData);
-    return response.data;
+    try {
+      logger.info('Updating user:', id, userData);
+      const response = await axios.put(
+        `${API_ENDPOINTS.USERS.BASE}/${id}`,
+        userData
+      );
+      logger.success('User updated successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error updating user:', error);
+      throw error;
+    }
+  },
+
+  // POST /api/users
+  create: async (userData) => {
+    try {
+      logger.info('Creating new user:', userData);
+      const response = await axios.post(API_ENDPOINTS.USERS.BASE, userData);
+      logger.success('User created successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error creating user:', error);
+      throw error;
+    }
+  },
+
+  // DELETE /api/users/{id}
+  delete: async (id) => {
+    try {
+      logger.info('Deleting user:', id);
+      const response = await axios.delete(`${API_ENDPOINTS.USERS.BASE}/${id}`);
+      logger.success('User deleted successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error deleting user:', error);
+      throw error;
+    }
   },
 };
 
@@ -100,14 +75,13 @@ export const complaintsService = {
   // GET /complaints/all (public endpoint for all complaints)
   getAll: async () => {
     try {
-      const response = await api.get('/complaints/all');
+      logger.debug('Fetching all complaints...');
+      const response = await axios.get(API_ENDPOINTS.COMPLAINTS.ALL);
+      logger.debug('Complaints fetched successfully:', response);
       return response.data;
     } catch (error) {
+      logger.warn('Complaints endpoint not available or failed:', error);
       // If endpoint doesn't exist or returns error, return empty array
-      console.warn(
-        'Complaints endpoint not available or failed:',
-        error.message
-      );
       return {
         data: {
           complaints: [],
@@ -119,43 +93,97 @@ export const complaintsService = {
     }
   },
 
-  // GET /complaints/{id}
+  // GET /api/complaints/{id}
   getById: async (id) => {
-    const response = await api.get(`/complaints/${id}`);
-    return response.data;
+    try {
+      logger.debug('Fetching complaint by ID:', id);
+      const response = await axios.get(
+        `${API_ENDPOINTS.COMPLAINTS.BASE}/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      logger.error('Error fetching complaint by ID:', error);
+      throw error;
+    }
   },
 
-  // POST /complaints
+  // POST /api/complaints
   create: async (complaintData) => {
-    const response = await api.post('/complaints', complaintData);
-    return response.data;
+    try {
+      logger.info('Creating new complaint:', complaintData);
+      const response = await axios.post(
+        API_ENDPOINTS.COMPLAINTS.BASE,
+        complaintData
+      );
+      logger.success('Complaint created successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error creating complaint:', error);
+      throw error;
+    }
   },
 
-  // PUT /complaints/{id}
+  // PUT /api/complaints/{id}
   update: async (id, complaintData) => {
-    const response = await api.put(`/complaints/${id}`, complaintData);
-    return response.data;
+    try {
+      logger.info('Updating complaint:', id, complaintData);
+      const response = await axios.put(
+        `${API_ENDPOINTS.COMPLAINTS.BASE}/${id}`,
+        complaintData
+      );
+      logger.success('Complaint updated successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error updating complaint:', error);
+      throw error;
+    }
   },
 
-  // DELETE /complaints/{id}
+  // DELETE /api/complaints/{id}
   delete: async (id) => {
-    const response = await api.delete(`/complaints/${id}`);
-    return response.data;
+    try {
+      logger.info('Deleting complaint:', id);
+      const response = await axios.delete(
+        `${API_ENDPOINTS.COMPLAINTS.BASE}/${id}`
+      );
+      logger.success('Complaint deleted successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error deleting complaint:', error);
+      throw error;
+    }
   },
 };
 
 export const collaborationsService = {
-  // POST /collaborations
+  // POST /api/collaborations
   create: async (collaborationData) => {
-    const response = await api.post('/collaborations', collaborationData);
-    return response.data;
+    try {
+      logger.info('Creating new collaboration:', collaborationData);
+      const response = await axios.post(
+        API_ENDPOINTS.COLLABORATIONS.BASE,
+        collaborationData
+      );
+      logger.success('Collaboration created successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error creating collaboration:', error);
+      throw error;
+    }
   },
 
-  // DELETE /collaborations
+  // DELETE /api/collaborations
   delete: async (collaborationData) => {
-    const response = await api.delete('/collaborations', {
-      data: collaborationData,
-    });
-    return response.data;
+    try {
+      logger.info('Deleting collaboration:', collaborationData);
+      const response = await axios.delete(API_ENDPOINTS.COLLABORATIONS.BASE, {
+        data: collaborationData,
+      });
+      logger.success('Collaboration deleted successfully');
+      return response.data;
+    } catch (error) {
+      logger.error('Error deleting collaboration:', error);
+      throw error;
+    }
   },
 };

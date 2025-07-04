@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import AtThahirinLogo from '../components/AtThahirinLogo';
 
 const LoginPage = () => {
@@ -11,7 +11,7 @@ const LoginPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [language, setLanguage] = useState('id');
 
-  const { login } = useContext(AuthContext);
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -82,22 +82,10 @@ const LoginPage = () => {
     }
 
     try {
-      const success = await login(username, password, role);
+      const success = await login(username, password);
       if (success) {
-        // Navigate based on role - all roles go to dashboard for unified experience
-        switch (role) {
-          case 'siswa':
-            navigate('/dashboard');
-            break;
-          case 'guru':
-            navigate('/dashboard');
-            break;
-          case 'admin':
-            navigate('/dashboard');
-            break;
-          default:
-            navigate('/dashboard');
-        }
+        // Navigate to dashboard for unified experience
+        navigate('/dashboard');
       } else {
         setError(
           language === 'id'

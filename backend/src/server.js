@@ -6,54 +6,45 @@ const jwt = require('@hapi/jwt');
 const inert = require('@hapi/inert');
 const fs = require('fs');
 
-// Import simplified modules
+// Import only needed modules
 const auth = require('./api/auth');
 const users = require('./api/users');
 const complaints = require('./api/complaints');
 
-// Import data modules (subjects, classes)
-const subjects = require('./api/data/subjects');
-const classes = require('./api/data/classes');
-
-// Import simplified services
+// Import only needed services
 const AuthService = require('./services/AuthService');
 const UsersService = require('./services/UsersService');
-const DataService = require('./services/DataService');
 const ComplaintsService = require('./services/ComplaintsService');
-
-// Import legacy services
-const SubjectsService = require('./services/postgres/SubjectsService');
-const ClassesService = require('./services/postgres/ClassesService');
-const CollaborationsService = require('./services/postgres/CollaborationsService');
-const ActivitiesService = require('./services/postgres/ActivitiesService');
 
 // Import validators
 const AuthValidator = require('./validator/auth');
 const UsersValidator = require('./validator/users');
 const ComplaintsValidator = require('./validator/complaints');
-const SubjectsValidator = require('./validator/subjects');
-const ClassesValidator = require('./validator/classes');
 
 const ClientError = require('./exceptions/ClientError');
-const NotFoundError = require('./exceptions/NotFoudError');
+const NotFoundError = require('./exceptions/NotFoundError');
 const AuthenticationError = require('./exceptions/AuthenticationError');
 const AuthorizationError = require('./exceptions/AuthorizationError');
 
 const init = async () => {
-  // Initialize simplified services
-  const authService = new AuthService();
-  const usersService = new UsersService();
-  const dataService = new DataService();
-  const complaintsService = new ComplaintsService();
+  console.log('🚀 Initializing School Complaints System v2.0...');
 
-  // Initialize legacy services for data management
-  const subjectsService = new SubjectsService();
-  const activitiesService = new ActivitiesService();
-  const collaborationsService = new CollaborationsService();
-  const classesService = new ClassesService(
-    collaborationsService,
-    activitiesService
-  );
+  // Initialize only needed services
+  let authService, usersService, complaintsService;
+
+  try {
+    authService = new AuthService();
+    console.log('✅ AuthService initialized');
+
+    usersService = new UsersService();
+    console.log('✅ UsersService initialized');
+
+    complaintsService = new ComplaintsService();
+    console.log('✅ ComplaintsService initialized');
+  } catch (error) {
+    console.error('❌ Failed to initialize services:', error);
+    process.exit(1);
+  }
 
   const server = Hapi.server({
     port: process.env.PORT || 5000,
@@ -61,6 +52,8 @@ const init = async () => {
     routes: {
       cors: {
         origin: ['*'],
+        headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match'],
+        additionalHeaders: ['cache-control', 'x-requested-with'],
       },
     },
   });
@@ -75,7 +68,6 @@ const init = async () => {
   server.app = {
     authService,
     usersService,
-    dataService,
     complaintsService,
     validator: {
       validateLoginPayload: AuthValidator.validateLoginPayload,
@@ -85,6 +77,8 @@ const init = async () => {
       validateComplaintPayload: ComplaintsValidator.validateComplaintPayload,
     },
   };
+
+  // Test database connection before continuing
 
   // Register JWT plugin
   await server.register([jwt, inert]);
@@ -130,7 +124,7 @@ const init = async () => {
     },
   });
 
-  // Register simplified plugins
+  // Register only needed plugins
   await server.register([
     auth,
     users,
@@ -139,20 +133,6 @@ const init = async () => {
       options: {
         service: complaintsService,
         validator: ComplaintsValidator,
-      },
-    },
-    {
-      plugin: subjects,
-      options: {
-        service: subjectsService,
-        validator: SubjectsValidator,
-      },
-    },
-    {
-      plugin: classes,
-      options: {
-        service: classesService,
-        validator: ClassesValidator,
       },
     },
   ]);
@@ -239,15 +219,7 @@ const init = async () => {
   });
 
   await server.start();
-  console.log(`🚀 SIMPLIFIED SCHOOL COMPLAINTS SYSTEM v2.0`);
   console.log(`📡 Backend Server: ${server.info.uri}`);
-  console.log(`🔧 Available endpoints:`);
-  console.log(`  - POST /api/auth/login`);
-  console.log(`  - POST /api/auth/register`);
-  console.log(`  - GET /api/users`);
-  console.log(`  - POST /api/users`);
-  console.log(`  - GET /api/complaints`);
-  console.log(`  - POST /api/complaints`);
 };
 
 process.on('unhandledRejection', (err) => {

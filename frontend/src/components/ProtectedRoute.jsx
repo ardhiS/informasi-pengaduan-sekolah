@@ -1,9 +1,10 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requiredRole = null }) => {
   const { isAuthenticated, loading, user } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -15,8 +16,30 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
-  if (!isAuthenticated) {
-    // Redirect to landing page when not authenticated
+
+  if (!isAuthenticated || !user) {
+    // Store the attempted URL for redirect after login
+    localStorage.setItem('redirectUrl', location.pathname);
+
+    // Redirect to appropriate login page based on current path
+    const currentPath = location.pathname;
+    if (currentPath.includes('/admin')) {
+      return <Navigate to='/login/admin' replace />;
+    } else if (currentPath.includes('/guru')) {
+      return <Navigate to='/login/guru' replace />;
+    } else if (currentPath.includes('/siswa')) {
+      return <Navigate to='/login/siswa' replace />;
+    } else {
+      // Default to landing page for dashboard and unknown routes
+      return <Navigate to='/' replace />;
+    }
+  }
+
+  // Check role-based access if required
+  if (requiredRole && user.role !== requiredRole) {
+    console.warn(
+      `Access denied. Required role: ${requiredRole}, User role: ${user.role}`
+    );
     return <Navigate to='/' replace />;
   }
 

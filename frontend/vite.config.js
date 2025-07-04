@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    force: true, // Force full reload on changes
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
@@ -28,16 +29,9 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/complaints/, '/api/complaints'),
       },
-      '/subjects': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/subjects/, '/api/subjects'),
-      },
-      '/classes': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/classes/, '/api/classes'),
-      },
     },
+  },
+  optimizeDeps: {
+    force: true, // Force re-optimization of dependencies
   },
 });

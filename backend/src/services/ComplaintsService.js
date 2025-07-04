@@ -1,13 +1,35 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../exceptions/InvariantError');
-const NotFoundError = require('../exceptions/NotFoudError');
+const NotFoundError = require('../exceptions/NotFoundError');
 
 class ComplaintsService {
   constructor() {
+    this._pool = null;
+    this._initPool();
+  }
+
+  async _initPool() {
     try {
-      this._pool = new Pool();
-      console.log('✅ ComplaintsService: Database pool initialized');
+      this._pool = new Pool({
+        user: process.env.PGUSER || 'developer',
+        host: process.env.PGHOST || 'localhost',
+        database: process.env.PGDATABASE || 'notesapp',
+        password: process.env.PGPASSWORD || 'supersecretpassword',
+        port: process.env.PGPORT || 5432,
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      });
+
+      // Test connection
+      const client = await this._pool.connect();
+      await client.query('SELECT 1');
+      client.release();
+
+      console.log(
+        '✅ ComplaintsService: Database pool initialized successfully'
+      );
     } catch (error) {
       console.error(
         '❌ ComplaintsService: Failed to initialize database pool:',
@@ -15,6 +37,13 @@ class ComplaintsService {
       );
       throw error;
     }
+  }
+
+  async _ensureConnection() {
+    if (!this._pool) {
+      await this._initPool();
+    }
+    return this._pool;
   }
 
   async addComplaint({
@@ -114,96 +143,124 @@ class ComplaintsService {
     limit = 50,
     offset = 0,
   } = {}) {
-    let whereConditions = [];
-    let values = [];
-    let valueIndex = 1;
+    try {
+      const pool = await this._ensureConnection();
 
-    // Role-based filtering
-    if (user_role === 'siswa' || user_role === 'guru') {
-      // Students and teachers only see approved complaints
-      whereConditions.push(`c.approval_status = $${valueIndex++}`);
-      values.push('approved');
-    } else if (user_role === 'admin') {
-      // Admin sees all complaints
-      if (approval_status) {
+      let whereConditions = [];
+      let values = [];
+      let valueIndex = 1;
+
+      // Role-based filtering
+      if (user_role === 'siswa' || user_role === 'guru') {
+        // Students and teachers only see approved complaints
         whereConditions.push(`c.approval_status = $${valueIndex++}`);
-        values.push(approval_status);
+        values.push('approved');
+      } else if (user_role === 'admin') {
+        // Admin sees all complaints
+        if (approval_status) {
+          whereConditions.push(`c.approval_status = $${valueIndex++}`);
+          values.push(approval_status);
+        }
       }
+
+      if (status) {
+        whereConditions.push(`c.status = $${valueIndex++}`);
+        values.push(status);
+      }
+
+      if (category) {
+        whereConditions.push(`c.category = $${valueIndex++}`);
+        values.push(category);
+      }
+
+      if (priority) {
+        whereConditions.push(`c.priority = $${valueIndex++}`);
+        values.push(priority);
+      }
+
+      if (user_id) {
+        whereConditions.push(`c.user_id = $${valueIndex++}`);
+        values.push(user_id);
+      }
+
+      const whereClause =
+        whereConditions.length > 0
+          ? `WHERE ${whereConditions.join(' AND ')}`
+          : '';
+
+      values.push(parseInt(limit, 10), parseInt(offset, 10));
+
+      // Select fields based on role - hide reporter info for students and teachers
+      let selectFields;
+      if (user_role === 'admin') {
+        selectFields = `c.*, 
+                        u.username as assigned_username,
+                        u.fullname as assigned_fullname,
+                        approver.username as approved_by_username,
+                        approver.fullname as approved_by_fullname`;
+      } else {
+        selectFields = `c.id, c.title, c.description, c.category, c.status, c.priority,
+                        c.approval_status, c.reported_at, c.resolved_at, c.updated_at,
+                        c.admin_notes, c.resolution, c.assigned_to,
+                        u.username as assigned_username,
+                        u.fullname as assigned_fullname`;
+      }
+
+      const query = {
+        text: `SELECT ${selectFields}
+               FROM complaints c
+               LEFT JOIN users u ON c.assigned_to = u.id
+               LEFT JOIN users approver ON c.approved_by = approver.id
+               ${whereClause}
+               ORDER BY c.reported_at DESC
+               LIMIT $${valueIndex++} OFFSET $${valueIndex++}`,
+        values,
+      };
+
+      console.log('🔍 ComplaintsService: Executing query:', query.text);
+      console.log('🔍 ComplaintsService: Query values:', values);
+
+      const result = await pool.query(query);
+
+      console.log(
+        '✅ ComplaintsService: Query successful, rows:',
+        result.rows.length
+      );
+
+      // Get images for each complaint
+      const complaintsWithImages = await Promise.all(
+        result.rows.map(async (complaint) => {
+          try {
+            const imagesQuery = {
+              text: 'SELECT * FROM complaint_images WHERE complaint_id = $1 ORDER BY uploaded_at',
+              values: [complaint.id],
+            };
+            const imagesResult = await pool.query(imagesQuery);
+
+            return {
+              ...complaint,
+              images: imagesResult.rows,
+            };
+          } catch (error) {
+            console.error(
+              '❌ Error fetching images for complaint',
+              complaint.id,
+              ':',
+              error
+            );
+            return {
+              ...complaint,
+              images: [],
+            };
+          }
+        })
+      );
+
+      return complaintsWithImages;
+    } catch (error) {
+      console.error('❌ ComplaintsService: Error in getAllComplaints:', error);
+      throw error;
     }
-
-    if (status) {
-      whereConditions.push(`c.status = $${valueIndex++}`);
-      values.push(status);
-    }
-
-    if (category) {
-      whereConditions.push(`c.category = $${valueIndex++}`);
-      values.push(category);
-    }
-
-    if (priority) {
-      whereConditions.push(`c.priority = $${valueIndex++}`);
-      values.push(priority);
-    }
-
-    if (user_id) {
-      whereConditions.push(`c.user_id = $${valueIndex++}`);
-      values.push(user_id);
-    }
-
-    const whereClause =
-      whereConditions.length > 0
-        ? `WHERE ${whereConditions.join(' AND ')}`
-        : '';
-
-    values.push(parseInt(limit, 10), parseInt(offset, 10));
-
-    // Select fields based on role - hide reporter info for students and teachers
-    let selectFields;
-    if (user_role === 'admin') {
-      selectFields = `c.*, 
-                      u.username as assigned_username,
-                      u.fullname as assigned_fullname,
-                      approver.username as approved_by_username,
-                      approver.fullname as approved_by_fullname`;
-    } else {
-      selectFields = `c.id, c.title, c.description, c.category, c.status, c.priority,
-                      c.approval_status, c.reported_at, c.resolved_at, c.updated_at,
-                      c.admin_notes, c.resolution, c.assigned_to,
-                      u.username as assigned_username,
-                      u.fullname as assigned_fullname`;
-    }
-
-    const query = {
-      text: `SELECT ${selectFields}
-             FROM complaints c
-             LEFT JOIN users u ON c.assigned_to = u.id
-             LEFT JOIN users approver ON c.approved_by = approver.id
-             ${whereClause}
-             ORDER BY c.reported_at DESC
-             LIMIT $${valueIndex++} OFFSET $${valueIndex++}`,
-      values,
-    };
-
-    const result = await this._pool.query(query);
-
-    // Get images for each complaint
-    const complaintsWithImages = await Promise.all(
-      result.rows.map(async (complaint) => {
-        const imagesQuery = {
-          text: 'SELECT * FROM complaint_images WHERE complaint_id = $1 ORDER BY uploaded_at',
-          values: [complaint.id],
-        };
-        const imagesResult = await this._pool.query(imagesQuery);
-
-        return {
-          ...complaint,
-          images: imagesResult.rows,
-        };
-      })
-    );
-
-    return complaintsWithImages;
   }
 
   async getComplaintById(id) {
@@ -329,60 +386,74 @@ class ComplaintsService {
   }
 
   async getComplaintStatistics() {
-    const stats = {};
+    try {
+      const pool = await this._ensureConnection();
+      const stats = {};
 
-    // Count by status
-    const statusQuery = await this._pool.query(`
-      SELECT status, COUNT(*) as count 
-      FROM complaints 
-      GROUP BY status
-    `);
+      // Count by status
+      const statusQuery = await pool.query(`
+        SELECT status, COUNT(*) as count 
+        FROM complaints 
+        GROUP BY status
+      `);
 
-    stats.byStatus = {};
-    statusQuery.rows.forEach((row) => {
-      stats.byStatus[row.status] = parseInt(row.count);
-    });
+      stats.byStatus = {};
+      statusQuery.rows.forEach((row) => {
+        stats.byStatus[row.status] = parseInt(row.count);
+      });
 
-    // Count by category
-    const categoryQuery = await this._pool.query(`
-      SELECT category, COUNT(*) as count 
-      FROM complaints 
-      GROUP BY category
-    `);
+      // Count by category
+      const categoryQuery = await pool.query(`
+        SELECT category, COUNT(*) as count 
+        FROM complaints 
+        GROUP BY category
+      `);
 
-    stats.byCategory = {};
-    categoryQuery.rows.forEach((row) => {
-      stats.byCategory[row.category] = parseInt(row.count);
-    });
+      stats.byCategory = {};
+      categoryQuery.rows.forEach((row) => {
+        stats.byCategory[row.category] = parseInt(row.count);
+      });
 
-    // Count by priority
-    const priorityQuery = await this._pool.query(`
-      SELECT priority, COUNT(*) as count 
-      FROM complaints 
-      GROUP BY priority
-    `);
+      // Count by priority
+      const priorityQuery = await pool.query(`
+        SELECT priority, COUNT(*) as count 
+        FROM complaints 
+        GROUP BY priority
+      `);
 
-    stats.byPriority = {};
-    priorityQuery.rows.forEach((row) => {
-      stats.byPriority[row.priority] = parseInt(row.count);
-    });
+      stats.byPriority = {};
+      priorityQuery.rows.forEach((row) => {
+        stats.byPriority[row.priority] = parseInt(row.count);
+      });
 
-    // Recent complaints (last 7 days)
-    const recentQuery = await this._pool.query(`
-      SELECT COUNT(*) as count 
-      FROM complaints 
-      WHERE reported_at > NOW() - INTERVAL '7 days'
-    `);
+      // Recent complaints (last 7 days)
+      const recentQuery = await pool.query(`
+        SELECT COUNT(*) as count 
+        FROM complaints 
+        WHERE reported_at > NOW() - INTERVAL '7 days'
+      `);
 
-    stats.recent = parseInt(recentQuery.rows[0].count);
+      stats.recent = parseInt(recentQuery.rows[0].count);
 
-    // Total complaints
-    const totalQuery = await this._pool.query(
-      'SELECT COUNT(*) as count FROM complaints'
-    );
-    stats.total = parseInt(totalQuery.rows[0].count);
+      // Total complaints
+      const totalQuery = await pool.query(
+        'SELECT COUNT(*) as count FROM complaints'
+      );
+      stats.total = parseInt(totalQuery.rows[0].count);
 
-    return stats;
+      console.log('✅ ComplaintsService: Statistics retrieved successfully');
+      return stats;
+    } catch (error) {
+      console.error('❌ ComplaintsService: Error getting statistics:', error);
+      // Return empty stats instead of throwing
+      return {
+        byStatus: {},
+        byCategory: {},
+        byPriority: {},
+        recent: 0,
+        total: 0,
+      };
+    }
   }
 
   async searchComplaints(searchTerm, filters = {}) {
