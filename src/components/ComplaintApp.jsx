@@ -1,13 +1,12 @@
 import React from "react";
 import Navbar from "./Navbar";
-import HomePage from "../pages/HomePage";
 import Footer from "./Footer";
+import ComplaintDetailsPage from "../pages/ComplaintDetailsPage";
 
 export default function ComplaintApp() {
 	return (
 		<>
-			<Navbar searchField logOutButton />
-			<HomePage />
+			<ComplaintDetailsPage />
 			<Footer />
 		</>
 	);

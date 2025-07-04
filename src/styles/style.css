@@ -5,9 +5,9 @@ body {
 }
 
 /* CSS bikin sendiri - Halaman Login */
-.kotak-login {
+.card-login {
 	max-width: 450px;
-	margin: 2rem auto;
+	margin: 5rem auto 0;
 	border: none;
 	border-radius: 0.75rem;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);

@@ -2,9 +2,9 @@ import React from "react";
 import favicon from "../assets/images/favicon-64x64.png";
 import { BsSearch, BsGlobe, BsGeoAltFill, BsMoonStars } from "react-icons/bs";
 
-export default function Navbar({ searchField, logOutButton }) {
+export default function Navbar({ searchField, logOutButton, onToggleTheme }) {
 	return (
-		<header className="navbar navbar-expand-lg bg-body-white shadow-sm">
+		<header className="navbar navbar-expand-lg bg-body shadow-sm position-sticky top-0 z-1">
 			<div className="container">
 				<a href="index.html" className="navbar-brand d-flex align-items-center">
 					<img
@@ -77,7 +77,8 @@ export default function Navbar({ searchField, logOutButton }) {
 						{/* Tombol toggle tema gelap/terang*/}
 						<button
 							className="btn btn-info btn-sm d-flex align-items-center"
-							style={{ height: "31px" }}>
+							style={{ height: "31px" }}
+							onClick={onToggleTheme}>
 							<BsMoonStars id="themeIcon" />
 						</button>
 
