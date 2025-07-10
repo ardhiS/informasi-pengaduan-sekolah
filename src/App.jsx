@@ -1,15 +1,8 @@
-import { useState, useEffect } from "react";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-// import ComplaintApp from "./components/ComplaintApp";
-import "./styles/style.css";
-import ComplaintForm from "./pages/complaints/ComplaintForm";
-import LoginPage from "./pages/LoginPage";
-import CurrentPage from "./pages/complaints/CategoriesPage";
-import CategoriesPage from "./pages/complaints/CategoriesPage";
-import HomePage from "./pages/HomePage";
+import { useState, useEffect, useMemo } from "react";
 import { BrowserRouter } from "react-router-dom";
 import ComplaintApp from "./components/ComplaintApp";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import "./styles/style.css";
 
 export default function App() {
 	const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -22,10 +15,20 @@ export default function App() {
 		document.documentElement.setAttribute("data-bs-theme", theme);
 	}, [theme]);
 
+	const themeContextValue = useMemo(
+		() => ({
+			theme,
+			toggleTheme,
+		}),
+		[theme]
+	);
+
 	return (
 		<>
 			<BrowserRouter>
-				<ComplaintApp toggleTheme={toggleTheme} />
+				<ThemeProvider value={themeContextValue}>
+					<ComplaintApp />
+				</ThemeProvider>
 			</BrowserRouter>
 		</>
 	);

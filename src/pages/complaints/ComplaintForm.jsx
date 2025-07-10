@@ -1,6 +1,24 @@
-import React from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import OffenseCategory from "../../components/OffenseCategory";
+import SecurityAlert from "../../components/SecurityAlert";
 
 export default function ComplaintForm() {
+	const categories = [
+		"intimidasi",
+		"bolos",
+		"perpeloncoan",
+		"merokok",
+		"merusak-fasilitas-sekolah",
+	];
+	const [selectedCategory, setSelectedCategory] = useState("");
+	const [customCategory, setCustomCategory] = useState("");
+
+	function handleCustomCategoryChange(e) {
+		setCustomCategory(e.target.value);
+		setSelectedCategory("lainnya");
+	}
+
 	return (
 		<main className="container my-5">
 			<div className="row justify-content-center">
@@ -31,13 +49,52 @@ export default function ComplaintForm() {
 										<i className="bi bi-list-ul text-info me-2"></i>
 										Kategori Pengaduan
 									</label>
-									<input
+									{/* <input
 										type="text"
 										className="form-control form-control-lg"
 										value="Merokok atau Vaping"
 										readOnly
 										style={{ backgroundColor: "#f8f9fa" }}
-									/>
+									/> */}
+									<div className="d-flex flex-wrap justify-content-between row-gap-3">
+										{categories.map((category) => {
+											return (
+												<OffenseCategory
+													category={category}
+													isChecked={selectedCategory === category}
+													onSelectedCategory={() =>
+														setSelectedCategory(category)
+													}
+													key={category}
+												/>
+											);
+										})}
+										<div className="d-flex w-100 gap-2">
+											<input
+												type="radio"
+												className={"btn-check"}
+												name="category"
+												id={"lainnya"}
+												value={"lainnya"}
+												checked={selectedCategory === "lainnya"}
+												onChange={() => setSelectedCategory("lainnya")}
+											/>
+											<label
+												htmlFor={"lainnya"}
+												className={`btn btn-outline-secondary radio-card`}>
+												Lainnya
+											</label>
+
+											{selectedCategory === "lainnya" && (
+												<input
+													type="text"
+													className="form-control"
+													value={customCategory}
+													onChange={handleCustomCategoryChange}
+												/>
+											)}
+										</div>
+									</div>
 								</div>
 
 								{/* <!-- Deskripsi --> */}
@@ -139,12 +196,12 @@ export default function ComplaintForm() {
 
 								{/* <!-- Back Button --> */}
 								<div className="d-grid gap-3 d-sm-flex justify-content-sm-center">
-									<a
-										href="HalamanPilihKategori.html"
+									<Link
+										to={"/"}
 										className="btn btn-outline-info btn-lg px-4 fw-medium">
 										<i className="bi bi-arrow-left me-2"></i>
 										Kembali
-									</a>
+									</Link>
 								</div>
 							</form>
 						</div>
@@ -153,23 +210,7 @@ export default function ComplaintForm() {
 			</div>
 
 			{/* <!-- Security Alert --> */}
-			<div className="d-flex justify-content-center mt-4">
-				<div className="alert alert-success alert-success-custom d-flex align-items-center">
-					<div className="small">
-						<i className="bi bi-shield-fill-check me-1 shield-icon"></i>
-						<strong data-lang-id="Semua komunikasi bersifat anonim dan dienkripsi">
-							Semua komunikasi bersifat anonim dan dienkripsi
-						</strong>
-						,
-						<a
-							href="#"
-							className="text-decoration-underline link-custom"
-							data-lang-id="Pelajari lebih lanjut tentang anonimitas">
-							Pelajari lebih lanjut tentang anonimitas
-						</a>
-					</div>
-				</div>
-			</div>
+			<SecurityAlert />
 		</main>
 	);
 }

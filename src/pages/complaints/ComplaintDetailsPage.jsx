@@ -1,4 +1,6 @@
 import React from "react";
+import SecurityAlert from "../../components/SecurityAlert";
+import { Link } from "react-router-dom";
 
 export default function ComplaintDetailPage() {
 	return (
@@ -125,39 +127,24 @@ export default function ComplaintDetailPage() {
 
 							{/* <!-- Tombol navigasi --> */}
 							<div className="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-								<a
-									href="HalamanBeranda.html"
+								<Link
+									to={"/"}
 									className="btn btn-outline-info btn-lg px-4 fw-medium">
 									<i className="bi bi-house me-2"></i>Kembali ke Beranda
-								</a>
-								<a
+								</Link>
+								<Link
+									to={"/complaints/check"}
 									href="HalamanCekPengaduan.html"
 									className="btn btn-info btn-lg px-4 fw-medium">
 									<i className="bi bi-search me-2"></i>Cek Pengaduan Lain
-								</a>
+								</Link>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			{/* <!-- Alert keamanan untuk menunjukkan anonimitas --> */}
-			<div className="d-flex justify-content-center mt-4">
-				<div className="alert alert-success alert-success-custom d-flex align-items-center">
-					<div className="small">
-						<i className="bi bi-shield-fill-check me-1 shield-icon"></i>
-						<strong data-lang-id="Semua komunikasi bersifat anonim dan dienkripsi">
-							Semua komunikasi bersifat anonim dan dienkripsi{" "}
-						</strong>
-						,
-						<a
-							href="#"
-							className="text-decoration-underline link-custom"
-							data-lang-id="Pelajari lebih lanjut tentang anonimitas">
-							Pelajari lebih lanjut tentang anonimitas
-						</a>
-					</div>
-				</div>
-			</div>
+			<SecurityAlert />
 		</main>
 	);
 }

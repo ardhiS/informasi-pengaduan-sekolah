@@ -104,7 +104,7 @@ body {
 */
 .radio-card:hover {
 	border-color: var(--bs-info) !important;
-	box-shadow: 0 4px 12px rgba(var(--bs-info-rgb), 0.15);
+	box-shadow: 0 4px 12px rgba(var(--bs-info-rgb), 0.5);
 	transform: translateY(-2px);
 }
 

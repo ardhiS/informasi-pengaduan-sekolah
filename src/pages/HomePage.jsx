@@ -1,20 +1,21 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import {
 	BsCheckCircleFill,
 	BsPlusCircleFill,
 	BsSearch,
 	BsShieldFillCheck,
 } from "react-icons/bs";
+import { Link } from "react-router-dom";
 
-import Navbar from "../components/Navbar";
+import SecurityAlert from "../components/SecurityAlert";
 
 function HomePage() {
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
-	const handleCreateComplaint = () => {
-		navigate("/category");
-	};
+	// const handleCreateComplaint = () => {
+	// 	navigate("/category");
+	// };
 
 	return (
 		<>
@@ -115,41 +116,33 @@ function HomePage() {
 
 						{/* <!-- Tombol aksi --> */}
 						<div className="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-							<button
+							{/* <button
 								onClick={handleCreateComplaint}
 								className="btn btn-info btn-lg px-4 d-flex align-items-center gap-2"
 								type="button">
 								<BsPlusCircleFill />
 
 								<span data-lang-id="Buat Pengaduan">Buat Pengaduan</span>
-							</button>
+							</button> */}
 
-							<a
-								href="#"
+							{/* Menggunakan Link dari react-router-dom */}
+							<Link
+								to={"/complaints/new"}
+								className="btn btn-info btn-lg px-4 d-flex align-items-center gap-2">
+								<BsPlusCircleFill />
+								<span data-lang-id="Buat Pengaduan">Buat Pengaduan</span>
+							</Link>
+
+							<Link
+								to={"/complaints/check"}
 								className="btn btn-outline-info btn-lg px-4 d-flex align-items-center gap-2">
 								<BsSearch />
 								<span data-lang-id="Cek Pengaduan">Cek Pengaduan</span>
-							</a>
+							</Link>
 						</div>
 
 						{/* <!-- Alert keamanan --> */}
-						<div className="d-flex justify-content-center mt-4">
-							<div className="alert alert-success alert-success-custom d-flex align-items-center">
-								<div className="small d-flex align-items-center">
-									<BsShieldFillCheck className="text-success me-1" />
-									<strong data-lang-id="Semua komunikasi bersifat anonim dan dienkripsi">
-										Semua komunikasi bersifat anonim dan dienkripsi{" "}
-									</strong>
-									,
-									<a
-										href="#"
-										className="text-decoration-underline link-custom"
-										data-lang-id="Pelajari lebih lanjut tentang anonimitas">
-										Pelajari lebih lanjut tentang anonimitas
-									</a>
-								</div>
-							</div>
-						</div>
+						<SecurityAlert />
 					</div>
 				</div>
 			</main>

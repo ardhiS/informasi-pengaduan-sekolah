@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AtThahirinLogo from "../assets/images/favicon-128x128.png";
 import { BsShieldFillCheck } from "react-icons/bs";
+import SecurityAlert from "../components/SecurityAlert";
 
 export default function LoginPage() {
 	return (
@@ -111,20 +112,7 @@ export default function LoginPage() {
 				</div>
 
 				{/* <!-- Alert informasi keamanan --> */}
-				<div className="alert alert-success alert-login d-flex align-items-center mx-auto mt-4">
-					<div className="small">
-						<i class="bi bi-shield-fill-check me-1 shield-icon text-success"></i>
-						<strong data-lang-id="Semua komunikasi bersifat anonim dan dienkripsi">
-							Semua komunikasi bersifat anonim dan dienkripsi,{" "}
-						</strong>
-						<a
-							href="#"
-							className="text-decoration-underline link-login"
-							data-lang-id="Pelajari lebih lanjut tentang anonimitas">
-							Pelajari lebih lanjut tentang anonimitas
-						</a>
-					</div>
-				</div>
+				<SecurityAlert />
 			</main>
 		</>
 	);
