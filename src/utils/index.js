@@ -1,0 +1,60 @@
+/**
+ * FUNGSI: simulateApiDelay
+ *
+ * Fungsi: Simulasi delay API (untuk testing)
+ * Berguna untuk menguji loading state
+ */
+
+export const simulateApiDelay = (ms = 1000) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+/**
+ * MOCK/Dummy DATABASE: mockUsers
+ *
+ * Data dummy untuk simulasi database user
+ * ini nanti diganti dengan API call ke server
+ * akun siswa : NIS  = 12345 PASSOWRD = siswa123
+ * akun guru : NIP =54321 Password = guru123
+ */
+const mockUsers = [
+  {
+    nisn: "12345",
+    password: "siswa123",
+    name: "Assad - Siswa",
+    role: "siswa",
+  },
+  {
+    nisn: "54321",
+    password: "guru123",
+    name: "Rahmat - Guru",
+    role: "guru",
+  },
+];
+
+/**
+ * FUNGSI: loginUser
+ *
+ * Fungsi: Simulasi API login
+ * Input: nisn dan password
+ * Output: { success: boolean, user/error: object/string }
+ */
+export const loginUser = async (nisn, password) => {
+  await simulateApiDelay(1500); // Simulasi delay network
+
+  // Cari user berdasarkan nisn dan password
+  const user = mockUsers.find(
+    (u) => u.nisn === nisn && u.password === password
+  );
+
+  if (user) {
+    // Login berhasil
+    return {
+      success: true,
+      user: { nisn: user.nisn, name: user.name, role: user.role },
+    };
+  }
+
+  // Login gagal
+  return { success: false, error: "NISN/NIP atau password salah" };
+};
