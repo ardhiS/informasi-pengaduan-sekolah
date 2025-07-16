@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 import OffenseCategory from "../../components/OffenseCategory";
 import SecurityAlert from "../../components/SecurityAlert";
+import useInput from "../../hooks/useInput";
+import useFormSubmit from "../../hooks/useFormSubmit";
+import useComplaintFiles from "../../hooks/useComplaintFiles";
+import useComplaintFormState from "../../hooks/useComplaintFormState";
+import { generateComplaintId, validateComplaintForm } from "../../utils";
 
 export default function ComplaintForm() {
+  // Hook untuk navigasi halaman
+  const navigate = useNavigate();
   const categories = [
     "intimidasi",
     "bolos",
@@ -11,6 +19,7 @@ export default function ComplaintForm() {
     "merokok",
     "merusak-fasilitas-sekolah",
   ];
+
   const [selectedCategory, setSelectedCategory] = useState("");
   const [customCategory, setCustomCategory] = useState("");
 
@@ -18,6 +27,73 @@ export default function ComplaintForm() {
     setCustomCategory(e.target.value);
     setSelectedCategory("lainnya");
   }
+
+  // State untuk menyimpan deskripsi pengaduan menggunakan custom hook
+  const [description, onDescriptionChange] = useInput("");
+  // State untuk menangani loading dan submit form menggunakan custom hook
+  const [loading, handleSubmit] = useFormSubmit();
+  // state untuk menangani Upload file menggunakan custom hook
+  const { selectedFiles, handleFileChange, setSelectedFiles } =
+    useComplaintFiles();
+  // state untuk menangani form notifikasi error dan aggrement check box menggunakan custom hook
+  const { formErrors, setFormErrors, agreement, setAgreement } =
+    useComplaintFormState();
+
+  // Handler ketika form disubmit
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    // Validasi form pengaduan
+    const validation = validateComplaintForm({
+      category:
+        selectedCategory === "lainnya" ? customCategory : selectedCategory,
+      description,
+    });
+
+    // Jika ada error, tampilkan pesan error
+    if (!validation.isValid) {
+      setFormErrors(validation.errors);
+      return;
+    }
+
+    // Reset error state
+    setFormErrors({});
+
+    // Proses submit form
+    await handleSubmit(async () => {
+      // Generate ID unik untuk pengaduan
+      const complaintId = generateComplaintId();
+
+      // Siapkan data pengaduan
+      const complaintData = {
+        id: complaintId,
+        category:
+          selectedCategory === "lainnya" ? customCategory : selectedCategory,
+        description,
+        date: new Date().toISOString(),
+        status: "Diajukan",
+      };
+
+      // Ambil data pengaduan yang sudah ada dari localStorage
+      const existingComplaints = JSON.parse(
+        localStorage.getItem("complaints") || "[]"
+      );
+      // Tambahkan pengaduan baru
+      existingComplaints.push(complaintData);
+      // Simpan kembali ke localStorage
+      localStorage.setItem("complaints", JSON.stringify(existingComplaints));
+      localStorage.setItem("currentComplaintId", complaintId);
+
+      // Reset semua field form
+      setSelectedCategory("");
+      setCustomCategory("");
+      onDescriptionChange({ target: { value: "" } });
+      setSelectedFiles([]);
+
+      // Delay sebelum redirect ke halaman sukses
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      navigate("/complaints/success");
+    });
+  };
 
   return (
     <main className="container my-5">
@@ -43,7 +119,7 @@ export default function ComplaintForm() {
                 Form Pengaduan
               </h3>
 
-              <form action="HalamanPengaduanSukses.html" method="POST">
+              <form onSubmit={onSubmit}>
                 {/* <!-- Kategori --> */}
                 <div className="mb-4">
                   <label className="form-label fw-semibold text-body mb-3">
@@ -93,10 +169,16 @@ export default function ComplaintForm() {
                           className="form-control"
                           value={customCategory}
                           onChange={handleCustomCategoryChange}
+                          placeholder="Masukkan kategori lainnya"
                         />
                       )}
                     </div>
                   </div>
+                  {formErrors.category && (
+                    <div className="text-danger mt-2 small">
+                      {formErrors.category}
+                    </div>
+                  )}
                 </div>
 
                 {/* <!-- Deskripsi --> */}
@@ -113,6 +195,8 @@ export default function ComplaintForm() {
                     id="description"
                     name="description"
                     rows="6"
+                    value={description}
+                    onChange={onDescriptionChange}
                     placeholder="Ceritakan detail pengaduan Anda dengan jelas..."
                     required
                   ></textarea>
@@ -122,6 +206,11 @@ export default function ComplaintForm() {
                       menindaklanjuti
                     </small>
                   </div>
+                  {formErrors.description && (
+                    <div className="text-danger mt-2 small">
+                      {formErrors.description}
+                    </div>
+                  )}
                 </div>
 
                 {/* <!-- Upload File --> */}
@@ -147,6 +236,7 @@ export default function ComplaintForm() {
                       multiple
                       accept="image/*"
                       id="fileUpload"
+                      onChange={handleFileChange}
                     />
                     <div className="mt-3">
                       <small className="text-dark">
@@ -154,16 +244,34 @@ export default function ComplaintForm() {
                         maksimal 10MB per file
                       </small>
                     </div>
-                  </div>
-
-                  {/* <!-- File Preview Area --> */}
-                  <div
-                    id="filePreview"
-                    className="mt-3"
-                    style={{ display: "none" }}
-                  >
-                    <h6>File yang dipilih:</h6>
-                    <div id="fileList"></div>
+                    {/* File Preview */}
+                    {selectedFiles.length > 0 && (
+                      <div className="mt-3 text-start text-dark">
+                        <h6>File yang dipilih:</h6>
+                        <ul className="small">
+                          {selectedFiles.map((file, index) => (
+                            <li className="list-group-item" key={index}>
+                              {file.name}
+                              <div className="mt-2">
+                                <img
+                                  src={URL.createObjectURL(file)}
+                                  alt={`preview-${index}`}
+                                  style={{
+                                    maxWidth: "200px",
+                                    height: "auto",
+                                    borderRadius: "8px",
+                                    marginTop: "8px",
+                                  }}
+                                  onLoad={(e) =>
+                                    URL.revokeObjectURL(e.target.src)
+                                  }
+                                />
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -176,6 +284,8 @@ export default function ComplaintForm() {
                         type="checkbox"
                         id="agreement"
                         name="agreement"
+                        checked={agreement}
+                        onChange={(e) => setAgreement(e.target.checked)}
                         required
                       />
                       <label
@@ -187,6 +297,11 @@ export default function ComplaintForm() {
                         penting.
                       </label>
                     </div>
+                    {formErrors.agreement && (
+                      <div className="text-danger mt-2 small">
+                        {formErrors.agreement}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -195,10 +310,10 @@ export default function ComplaintForm() {
                   <button
                     type="submit"
                     className="btn btn-info btn-lg fw-medium"
-                    id="submitBtn"
+                    disabled={loading}
                   >
                     <i className="bi bi-send me-2"></i>
-                    Kirim Pengaduan
+                    {loading ? "Mengirim..." : "Kirim Pengaduan"}
                   </button>
                 </div>
 

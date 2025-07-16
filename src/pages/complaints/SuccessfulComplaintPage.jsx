@@ -1,7 +1,22 @@
-import SecurityAlert from "../../components/SecurityAlert";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+import SecurityAlert from "../../components/SecurityAlert";
 
 export default function SuccessfulComplaintPage() {
+  //state untuk menyimpan ID Pengaduan yang berhasil dikirim
+  const [complaintId, setComplaintId] = useState("");
+
+  useEffect(() => {
+    //ambil ID Pengaduan terbaru dari local storage
+    const savedId = localStorage.getItem("currentComplaintId");
+    //jika ID ditemukan, simpan di state dan hapus saat di refresh
+    if (savedId) {
+      setComplaintId(savedId); //simpan ID ke state agar bisa di tampilkan
+      localStorage.removeItem("currentComplaintId"); //hapus ID saat di refresh
+    }
+  }, []);
+
   return (
     <main className="container my-5">
       <div className="row justify-content-center">
@@ -32,7 +47,8 @@ export default function SuccessfulComplaintPage() {
                 {/* <!-- Display kode pengaduan --> */}
                 <div className="bg-white border rounded-3 p-3 mb-3">
                   <h4 className="fw-bold text-dark mb-0 font-monospace fs-4">
-                    0173 8566 6898 3723
+                    {/* menampilkan ID Pengaduan yg baru dikirim */}
+                    {complaintId}
                   </h4>
                 </div>
                 {/* <!-- Peringatan penting --> */}

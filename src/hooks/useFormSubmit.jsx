@@ -8,7 +8,7 @@ import { useState } from "react";
  * - Mencegah double submit dengan mengaktifkan loading state
  * - Memastikan loading state dimatikan setelah proses selesai
  *
- * Cara pakai:
+ * Cara pakai (digunakan di ComplaintForm.jsx dan LoginPage.jsx) :
  * const [loading, handleSubmit] = useFormSubmit();
  *
  * // Dalam event handler:

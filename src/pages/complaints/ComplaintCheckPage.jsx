@@ -1,5 +1,6 @@
 import React from "react";
-import Navbar from "../../components/Navbar";
+import { Link } from "react-router-dom";
+
 import SecurityAlert from "../../components/SecurityAlert";
 
 export default function ComplaintCheckPage() {
@@ -86,7 +87,14 @@ export default function ComplaintCheckPage() {
           </div>
         </div>
       </div>
-
+      <div className="text-center mt-4">
+        <Link to="/" className="btn btn-outline-info me-2">
+          <i className="bi bi-house me-2"></i>Kembali ke Beranda
+        </Link>
+        <Link to="/complaints/list" className="btn btn-info">
+          <i className="bi bi-card-list me-2"></i>Lihat Semua Pengaduan
+        </Link>
+      </div>
       <SecurityAlert />
     </main>
   );

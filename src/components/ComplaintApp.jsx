@@ -12,6 +12,7 @@ import LoginPage from "../pages/LoginPage";
 import ComplaintCheckPage from "../pages/complaints/ComplaintCheckPage";
 import ComplaintDetailPage from "../pages/complaints/ComplaintDetailsPage";
 import SuccessfulComplaintPage from "../pages/complaints/SuccessfulComplaintPage";
+import ListComplaintsPage from "../pages/complaints/ListComplaintPage";
 import Loading from "./Loading";
 
 export default function ComplaintApp() {
@@ -48,6 +49,7 @@ export default function ComplaintApp() {
           element={<SuccessfulComplaintPage />}
         />
         <Route path="/complaints/detail" element={<ComplaintDetailPage />} />"
+        <Route path="/complaints/list" element={<ListComplaintsPage />} />
       </Routes>
       <Footer />
     </>

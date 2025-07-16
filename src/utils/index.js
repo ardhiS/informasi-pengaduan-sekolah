@@ -1,3 +1,62 @@
+import { nanoid } from "nanoid";
+
+/**
+ * FUNGSI: generateComplaintId
+ *
+ * Fungsi: Membuat ID unik untuk pengaduan
+ * Format: ADU + NANO ID 9 KARAKTER
+ * Contoh: ADU3gyfgedw3
+ */
+
+export const generateComplaintId = () => {
+  const prefix = "ADU";
+  const uniqueId = nanoid(6);
+  return `${prefix}${uniqueId}`;
+};
+
+/**
+ * FUNGSI: formatDate
+ *
+ * Fungsi: Format tangga
+ * Format: Date Object ataU tanggal string
+ * Contoh: "12 JULY 2025, 22:00"
+ */
+
+export const formatDate = (date) => {
+  return new Intl.DateTimeFormat("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date));
+};
+
+/**
+ * FUNGSI: validateComplaintForm
+ *
+ * Fungsi: Validasi data form pengaduan
+ * Input: Object dengan data form
+ * Output: {isValid: boolean, errors: object}
+ */
+
+export const validateComplaintForm = (data) => {
+  const errors = {};
+
+  if (!data.category || data.category.trim() === "") {
+    errors.category = "Kategori pengaduan harus dipilah";
+  }
+
+  if (!data.description || data.description.trim().length < 10) {
+    errors.description = "Deskripsi minimal 10 karakter";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
 /**
  * FUNGSI: simulateApiDelay
  *

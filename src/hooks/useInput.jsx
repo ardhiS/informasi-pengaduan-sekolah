@@ -10,7 +10,7 @@ import { useState } from "react";
  * - Menyederhanakan pengelolaan state input
  * - Dapat digunakan untuk semua jenis input (text, email, password, dll)
  *
- * Cara Pakai:
+ * Cara Pakai (digunakan di ComplaintForm.jsx dan LoginPage.jsx) :
  * const [nama, onNamaChange] = useInput(''); // untuk input nama
  * const [email, onEmailChange] = useInput(''); // untuk input email
  *
