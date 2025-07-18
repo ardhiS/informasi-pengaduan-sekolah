@@ -16,6 +16,15 @@ const up = (pgm) => {
       type: 'VARCHAR(100)',
       notNull: true,
     },
+    password: {
+      type: 'VARCHAR(255)',
+      notNull: true,
+    },
+    created_at: {
+      type: 'TIMESTAMP',
+      notNull: true,
+      default: pgm.func('current_timestamp'),
+    },
   });
 };
 

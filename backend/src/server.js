@@ -6,6 +6,8 @@ const jwt = require('@hapi/jwt');
 const inert = require('@hapi/inert');
 const fs = require('fs');
 
+const imageRoutes = require('./api/images/routes');
+
 // Import only needed modules
 const auth = require('./api/auth');
 const users = require('./api/users');
@@ -47,13 +49,16 @@ const init = async () => {
   }
 
   const server = Hapi.server({
-    port: process.env.PORT || 5000,
+    port: process.env.PORT || 8080,
     host: process.env.HOST || 'localhost',
     routes: {
       cors: {
         origin: ['*'],
         headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match'],
         additionalHeaders: ['cache-control', 'x-requested-with'],
+      },
+      files: {
+        relativeTo: require('path').join(__dirname, 'uploads')
       },
     },
   });
@@ -136,6 +141,8 @@ const init = async () => {
       },
     },
   ]);
+
+  server.route(imageRoutes);
 
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;
