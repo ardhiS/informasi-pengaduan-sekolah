@@ -2,7 +2,8 @@ import React from "react";
 import SecurityAlert from "../../components/SecurityAlert";
 import { Link } from "react-router-dom";
 
-export default function ComplaintDetailPage() {
+export default function ComplaintDetailPage({ complaintDetails }) {
+	const { id, category, description, date, status } = complaintDetails;
 	return (
 		<main className="container my-5">
 			<div className="row justify-content-center">
@@ -25,7 +26,7 @@ export default function ComplaintDetailPage() {
 							{/* <!-- Header card dengan nomor pengaduan dan status --> */}
 							<div className="d-flex justify-content-between align-items-center mb-4">
 								<h3 className="card-title fs-4 fw-semibold text-info mb-0">
-									<i className="bi bi-file-text me-2"></i>Pengaduan #799d7
+									<i className="bi bi-file-text me-2"></i>Pengaduan {id}
 								</h3>
 								<span className="badge bg-warning text-dark fs-6 px-3 py-2">
 									<i className="bi bi-clock me-1"></i>Diajukan
@@ -45,9 +46,7 @@ export default function ComplaintDetailPage() {
 									<label className="form-label fw-semibold text-dark mb-2 fs-6">
 										<i className="bi bi-tag text-info me-2"></i>Kategori
 									</label>
-									<p className="fw-medium text-dark mb-0">
-										Merokok atau Vaping
-									</p>
+									<p className="fw-medium text-dark mb-0">{category}</p>
 								</div>
 							</div>
 
@@ -58,13 +57,7 @@ export default function ComplaintDetailPage() {
 									Pengaduan
 								</label>
 								<div className="bg-body border rounded-3 p-3">
-									<p className="mb-0 lh-lg">
-										Saya ingin melaporkan adanya kegiatan merokok yang dilakukan
-										oleh beberapa siswa di area sekolah, tepatnya di dekat
-										toilet belakang dan parkiran sepeda. Kejadian ini saya lihat
-										berlangsung beberapa kali pada jam istirahat maupun setelah
-										jam pulang sekolah.
-									</p>
+									<p className="mb-0 lh-lg">{description}</p>
 								</div>
 							</div>
 
@@ -106,8 +99,9 @@ export default function ComplaintDetailPage() {
 									<div>
 										<h6 className="fw-semibold mb-2">Status Pengaduan</h6>
 										<p className="mb-0 small">
-											Pengaduan Anda sedang dalam proses review. Kami akan
-											memberikan update melalui sistem ini.
+											{status === "Diajukan"
+												? "Pengaduan Anda sedang dalam proses review. Kami akan memberikan update melalui sistem ini."
+												: "Dummy"}
 										</p>
 									</div>
 								</div>
@@ -116,8 +110,7 @@ export default function ComplaintDetailPage() {
 							{/* <!-- Timestamp pengaduan --> */}
 							<div className="d-flex justify-content-between align-items-center pt-3 border-top">
 								<small className="text-muted">
-									<i className="bi bi-calendar me-1"></i>Dibuat: 28 Juni 2025,
-									15:04
+									<i className="bi bi-calendar me-1"></i>Dibuat: {date}
 								</small>
 								<small className="text-muted">
 									<i className="bi bi-clock me-1"></i>Terakhir diubah: 28 Juni
