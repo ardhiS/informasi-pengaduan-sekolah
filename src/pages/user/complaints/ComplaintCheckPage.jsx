@@ -1,11 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import SecurityAlert from "../../components/SecurityAlert";
-import useInput from "../../hooks/useInput";
+import SecurityAlert from "../../../components/SecurityAlert";
+import useInput from "../../../hooks/useInput";
 
-export default function ComplaintCheckPage({ onComplaintCheck }) {
-	const [complaintId, onComplaintIdChange] = useInput();
+export default function ComplaintCheckPage() {
+	const [inputComplaintId, onComplaintIdChange] = useInput();
+	const navigate = useNavigate();
+	function handleSubmit(e) {
+		e.preventDefault();
+		const complaintId = inputComplaintId;
+		navigate(`/user/complaints/detail/${complaintId}`);
+	}
+
 	return (
 		<main className="container my-5">
 			<div className="row justify-content-center">
@@ -50,7 +57,7 @@ export default function ComplaintCheckPage({ onComplaintCheck }) {
 										placeholder="0000 0000 0000 0000"
 										maxLength="19"
 										style={{ fontSize: "1.1rem", letterSpacing: "0.1em" }}
-										value={complaintId}
+										value={inputComplaintId}
 										onChange={onComplaintIdChange}
 										required
 									/>
@@ -66,10 +73,7 @@ export default function ComplaintCheckPage({ onComplaintCheck }) {
 										<button
 											type="submit"
 											className="btn btn-info btn-lg w-100 py-3 fw-semibold rounded-3 shadow-sm"
-											onClick={(e) => {
-												e.preventDefault();
-												onComplaintCheck(complaintId);
-											}}>
+											onClick={handleSubmit}>
 											<i className="bi bi-search me-2 fs-5"></i>Cari Pengaduan
 										</button>
 									</div>
@@ -89,10 +93,10 @@ export default function ComplaintCheckPage({ onComplaintCheck }) {
 				</div>
 			</div>
 			<div className="text-center mt-4">
-				<Link to="/" className="btn btn-outline-info me-2">
+				<Link to="/user/home" className="btn btn-outline-info me-2">
 					<i className="bi bi-house me-2"></i>Kembali ke Beranda
 				</Link>
-				<Link to="/complaints/list" className="btn btn-info">
+				<Link to="/user/complaints/list" className="btn btn-info">
 					<i className="bi bi-card-list me-2"></i>Lihat Semua Pengaduan
 				</Link>
 			</div>

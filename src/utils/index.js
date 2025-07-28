@@ -91,6 +91,13 @@ const mockUsers = [
 	},
 ];
 
+const adminAccount = {
+	username: "6789",
+	password: "admin123",
+	name: "Admin",
+	role: "admin",
+};
+
 /**
  * FUNGSI: loginUser
  *
@@ -116,6 +123,18 @@ export const loginUser = async (nisn, password) => {
 
 	// Login gagal
 	return { success: false, error: "NISN/NIP atau password salah" };
+};
+
+export const loginAdmin = async (username, password) => {
+	await simulateApiDelay(1500);
+
+	if (
+		!(username === adminAccount.username && password === adminAccount.password)
+	) {
+		return { success: false, error: "Username atau Password salah" };
+	}
+
+	return { success: true, admin: adminAccount };
 };
 
 export const checkComplaint = async (complaintId) => {

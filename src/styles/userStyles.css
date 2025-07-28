@@ -36,6 +36,10 @@ body {
 	border-color: #0dcaf0 !important;
 }
 
+.btn-check:checked + .radio-card {
+	color: white !important;
+}
+
 .btn-outline-info:hover {
 	background-color: #0dcaf0 !important;
 	border-color: #0dcaf0 !important;
@@ -118,9 +122,9 @@ body {
 * Warna teks label akan menyesuaikan dengan --bs-info
 * pada mode light/dark yang aktif
 */
-.radio-card input[type="radio"]:checked + .radio-label {
+/* .radio-card input[type="radio"]:checked + .radio-label {
 	color: var(--bs-info) !important;
-}
+} */
 
 /*
 * Background dan border akan otomatis berubah menggunakan
@@ -137,4 +141,9 @@ body {
 	margin: 0;
 	width: 100%;
 	display: block;
+}
+
+.btn-outline-secondary:hover {
+	box-shadow: 0 4px 12px rgba(var(--bs-secondary-rgb), 1) !important;
+	border-color: rgba(var(--bs-secondary-rgb), 1) !important;
 }

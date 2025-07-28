@@ -1,9 +1,28 @@
-import React from "react";
-import SecurityAlert from "../../components/SecurityAlert";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import SecurityAlert from "../../../components/SecurityAlert";
+import { checkComplaint, formatDate } from "../../../utils";
+import Loading from "../../../components/Loading";
 
-export default function ComplaintDetailPage({ complaintDetails }) {
-	const { id, category, description, date, status } = complaintDetails;
+export default function ComplaintDetailPage() {
+	const { complaintId } = useParams();
+	const [complaintData, setComplaintData] = useState(null);
+	console.log(complaintId);
+	useEffect(() => {
+		async function fetchComplaintDetails() {
+			const complaintDetails = await checkComplaint(complaintId);
+			setComplaintData({
+				...complaintDetails,
+				date: formatDate(complaintDetails.date),
+			});
+		}
+
+		fetchComplaintDetails();
+	}, [complaintId]);
+	if (!complaintData) {
+		return <Loading />;
+	}
+
 	return (
 		<main className="container my-5">
 			<div className="row justify-content-center">
@@ -26,7 +45,8 @@ export default function ComplaintDetailPage({ complaintDetails }) {
 							{/* <!-- Header card dengan nomor pengaduan dan status --> */}
 							<div className="d-flex justify-content-between align-items-center mb-4">
 								<h3 className="card-title fs-4 fw-semibold text-info mb-0">
-									<i className="bi bi-file-text me-2"></i>Pengaduan {id}
+									<i className="bi bi-file-text me-2"></i>Pengaduan{" "}
+									{complaintData.id}
 								</h3>
 								<span className="badge bg-warning text-dark fs-6 px-3 py-2">
 									<i className="bi bi-clock me-1"></i>Diajukan
@@ -46,7 +66,9 @@ export default function ComplaintDetailPage({ complaintDetails }) {
 									<label className="form-label fw-semibold text-dark mb-2 fs-6">
 										<i className="bi bi-tag text-info me-2"></i>Kategori
 									</label>
-									<p className="fw-medium text-dark mb-0">{category}</p>
+									<p className="fw-medium text-dark mb-0">
+										{complaintData.category}
+									</p>
 								</div>
 							</div>
 
@@ -57,7 +79,7 @@ export default function ComplaintDetailPage({ complaintDetails }) {
 									Pengaduan
 								</label>
 								<div className="bg-body border rounded-3 p-3">
-									<p className="mb-0 lh-lg">{description}</p>
+									<p className="mb-0 lh-lg">{complaintData.description}</p>
 								</div>
 							</div>
 
@@ -99,7 +121,7 @@ export default function ComplaintDetailPage({ complaintDetails }) {
 									<div>
 										<h6 className="fw-semibold mb-2">Status Pengaduan</h6>
 										<p className="mb-0 small">
-											{status === "Diajukan"
+											{complaintData.status === "Diajukan"
 												? "Pengaduan Anda sedang dalam proses review. Kami akan memberikan update melalui sistem ini."
 												: "Dummy"}
 										</p>
@@ -110,7 +132,8 @@ export default function ComplaintDetailPage({ complaintDetails }) {
 							{/* <!-- Timestamp pengaduan --> */}
 							<div className="d-flex justify-content-between align-items-center pt-3 border-top">
 								<small className="text-muted">
-									<i className="bi bi-calendar me-1"></i>Dibuat: {date}
+									<i className="bi bi-calendar me-1"></i>Dibuat:{" "}
+									{complaintData.date}
 								</small>
 								<small className="text-muted">
 									<i className="bi bi-clock me-1"></i>Terakhir diubah: 28 Juni
@@ -121,12 +144,12 @@ export default function ComplaintDetailPage({ complaintDetails }) {
 							{/* <!-- Tombol navigasi --> */}
 							<div className="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
 								<Link
-									to={"/"}
+									to={"/user/home"}
 									className="btn btn-outline-info btn-lg px-4 fw-medium">
 									<i className="bi bi-house me-2"></i>Kembali ke Beranda
 								</Link>
 								<Link
-									to={"/complaints/check"}
+									to={"/user/complaints/check"}
 									href="HalamanCekPengaduan.html"
 									className="btn btn-info btn-lg px-4 fw-medium">
 									<i className="bi bi-search me-2"></i>Cek Pengaduan Lain

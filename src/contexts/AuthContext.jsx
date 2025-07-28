@@ -27,12 +27,12 @@ const AuthContext = createContext();
  * const { user, loading } = useAuth();
  */
 export function useAuth() {
-  const context = useContext(AuthContext);
-  // Memastikan hook digunakan dalam AuthProvider
-  if (!context) {
-    throw new Error("useAuth harus digunakan dalam AuthProvider");
-  }
-  return context;
+	const context = useContext(AuthContext);
+	// Memastikan hook digunakan dalam AuthProvider
+	if (!context) {
+		throw new Error("useAuth harus digunakan dalam AuthProvider");
+	}
+	return context;
 }
 
 /**
@@ -49,35 +49,61 @@ export function useAuth() {
  * </AuthProvider>
  */
 export function AuthProvider({ children }) {
-  // State untuk menyimpan data user
-  const [user, setUser] = useState(null);
-  // State untuk menandai proses loading
-  const [loading, setLoading] = useState(true);
+	// State untuk menyimpan data user
+	const [user, setUser] = useState(null);
+	// State untuk menandai proses loading
+	const [loading, setLoading] = useState(true);
+	const [admin, setAdmin] = useState(null);
 
-  // Effect untuk mengecek user yang tersimpan di localStorage saat komponen dimount
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
-  }, []);
+	// Effect untuk mengecek user yang tersimpan di localStorage saat komponen dimount
+	useEffect(() => {
+		const savedUser = localStorage.getItem("user");
+		const savedAdmin = localStorage.getItem("admin");
 
-  // Fungsi untuk melakukan login
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-  };
+		if (savedUser) {
+			setUser(JSON.parse(savedUser));
+		}
+		if (savedAdmin) {
+			setAdmin(JSON.parse(savedAdmin));
+		}
 
-  // Fungsi untuk melakukan logout
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-  };
+		setLoading(false);
+	}, []);
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+	// Fungsi untuk melakukan login
+	const login = (userData) => {
+		setUser(userData);
+		localStorage.setItem("user", JSON.stringify(userData));
+	};
+
+	// Fungsi untuk melakukan logout
+	const logout = () => {
+		setUser(null);
+		localStorage.removeItem("user");
+	};
+
+	const saveAdminToLocalStorage = (adminData) => {
+		setAdmin(adminData);
+		localStorage.setItem("admin", JSON.stringify(adminData));
+	};
+
+	const removeAdminFromLocalStorage = () => {
+		setAdmin(null);
+		localStorage.removeItem("admin");
+	};
+
+	return (
+		<AuthContext.Provider
+			value={{
+				user,
+				loading,
+				login,
+				logout,
+				admin,
+				saveAdminToLocalStorage,
+				removeAdminFromLocalStorage,
+			}}>
+			{children}
+		</AuthContext.Provider>
+	);
 }

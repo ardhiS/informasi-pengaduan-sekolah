@@ -1,5 +1,4 @@
 import React from "react";
-// import { useNavigate } from "react-router-dom";
 import {
 	BsCheckCircleFill,
 	BsPlusCircleFill,
@@ -8,15 +7,9 @@ import {
 } from "react-icons/bs";
 import { Link } from "react-router-dom";
 
-import SecurityAlert from "../components/SecurityAlert";
+import SecurityAlert from "../../components/SecurityAlert";
 
 function HomePage() {
-	// const navigate = useNavigate();
-
-	// const handleCreateComplaint = () => {
-	// 	navigate("/category");
-	// };
-
 	return (
 		<>
 			<main className="container my-5">
@@ -127,14 +120,14 @@ function HomePage() {
 
 							{/* Menggunakan Link dari react-router-dom */}
 							<Link
-								to={"/complaints/new"}
+								to={"/user/complaints/form"}
 								className="btn btn-info btn-lg px-4 d-flex align-items-center gap-2">
 								<BsPlusCircleFill />
 								<span data-lang-id="Buat Pengaduan">Buat Pengaduan</span>
 							</Link>
 
 							<Link
-								to={"/complaints/check"}
+								to={"/user/complaints/check"}
 								className="btn btn-outline-info btn-lg px-4 d-flex align-items-center gap-2">
 								<BsSearch />
 								<span data-lang-id="Cek Pengaduan">Cek Pengaduan</span>
