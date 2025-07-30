@@ -1,4 +1,11 @@
+import { Link } from "react-router-dom";
+import useInput from "../../hooks/useInput";
+// import { addTeacher } from "../../utils";
+
 export default function AddTeacherPage() {
+	const [employeeIdNumber, onEmployeeIdNumberChange] = useInput();
+	const [fullName, onFullNameChange] = useInput();
+	const [subject, onSubjectChange] = useInput();
 	return (
 		<div className="container py-4">
 			<div className="card shadow-sm">
@@ -20,6 +27,8 @@ export default function AddTeacherPage() {
 									className="form-control"
 									id="nip"
 									placeholder="Masukkan Nomor Induk Pegawai"
+									value={employeeIdNumber}
+									onChange={onEmployeeIdNumberChange}
 									required
 								/>
 							</div>
@@ -37,6 +46,8 @@ export default function AddTeacherPage() {
 									className="form-control"
 									id="nama_guru"
 									placeholder="Contoh: Dr. Nama, M.Pd."
+									value={fullName}
+									onChange={onFullNameChange}
 									required
 								/>
 							</div>
@@ -54,20 +65,19 @@ export default function AddTeacherPage() {
 									className="form-control"
 									id="mapel"
 									placeholder="Contoh: Matematika"
+									value={subject}
+									onChange={onSubjectChange}
 									required
 								/>
 							</div>
 						</div>
 					</form>
 				</div>
-				<div className="card-footer bg-white text-end">
-					<a href="list-guru.html" className="btn btn-secondary me-2">
+				<div className="card-footer bg-body text-end">
+					<Link to={"/admin/home"} className="btn btn-secondary me-2">
 						Batal
-					</a>
-					<button
-						type="submit"
-						form="form-tambah-guru"
-						className="btn btn-primary">
+					</Link>
+					<button type="submit" className="btn btn-primary">
 						<i className="bi bi-save me-2"></i>Simpan Data
 					</button>
 				</div>

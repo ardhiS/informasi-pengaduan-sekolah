@@ -2,30 +2,48 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useInput from "../../hooks/useInput";
 import useFormSubmit from "../../hooks/useFormSubmit";
-import { loginAdmin } from "../../utils";
-import { useAuth } from "../../contexts/AuthContext";
+// import { loginAdmin } from "../../utils";
+// import { useAuth } from "../../contexts/AuthContext";
+
+import {
+	login,
+	putAccessToken,
+	putRefreshToken,
+} from "../../utils/network-data";
 
 export default function AdminLoginPage() {
 	const [username, onChangeUsername] = useInput();
 	const [password, onChangePassword] = useInput();
 	const [loading, handleSubmit] = useFormSubmit();
 	const [error, setError] = useState("");
-	const { saveAdminToLocalStorage } = useAuth();
 	const navigate = useNavigate();
 
 	const submitHandler = async (event) => {
 		event.preventDefault();
+		// await handleSubmit(async () => {
+		// 	const result = await loginAdmin(username, password);
+		// 	console.log(result);
+		// 	if (!result.success) {
+		// 		setError(result.error);
+		// 		return;
+		// 	}
+		// 	saveAdminToLocalStorage(result.admin);
+		// 	console.log("Admin after save:", result); // ✅ log ini
+		// 	navigate("/admin/home");
+		// 	console.log("Navigate");
+		// });
+
 		await handleSubmit(async () => {
-			const result = await loginAdmin(username, password);
-			console.log(result);
-			if (!result.success) {
-				setError(result.error);
+			const { error, data } = await login({ username, password });
+
+			if (error || !data?.accessToken || !data?.refreshToken) {
+				setError("Username atau Password salah");
 				return;
 			}
-			saveAdminToLocalStorage(result.admin);
-			console.log("Admin after save:", result); // ✅ log ini
+			putAccessToken(data.accessToken);
+			putRefreshToken(data.refreshToken);
+
 			navigate("/admin/home");
-			console.log("Navigate");
 		});
 	};
 	return (

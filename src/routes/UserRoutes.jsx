@@ -10,6 +10,7 @@ import SuccessfulComplaintPage from "../pages/user/complaints/SuccessfulComplain
 import ListComplaintsPage from "../pages/user/complaints/ListComplaintPage";
 import ComplaintDetailPage from "../pages/user/complaints/ComplaintDetailsPage";
 import ComplaintCheckPage from "../pages/user/complaints/ComplaintCheckPage";
+import { userRoutesList } from "./userRoutesList";
 
 import "../styles/userStyles.css";
 
@@ -19,18 +20,24 @@ export default function UserRoutes() {
 			<Route path="/" element={<UserLayout />}>
 				<Route index element={<UserLoginPage />} />
 				<Route element={<ProtectedRoutes />}>
-					<Route path="home" element={<UserHomePage />} />
+					{/* <Route path="home" element={<UserHomePage />} />
 					<Route path="complaints/form" element={<ComplaintForm />} />
 					<Route
 						path="complaints/succeed"
 						element={<SuccessfulComplaintPage />}
 					/>
 					<Route path="complaints/list" element={<ListComplaintsPage />} />
+					<Route path="complaints/check" element={<ComplaintCheckPage />} /> */}
+
+					{userRoutesList.map((route) => {
+						const { path, page: Page } = route;
+						return <Route key={path} path={path} element={<Page />} />;
+					})}
+
 					<Route
 						path="complaints/detail/:complaintId"
 						element={<ComplaintDetailPage />}
 					/>
-					<Route path="complaints/check" element={<ComplaintCheckPage />} />
 				</Route>
 			</Route>
 		</Routes>

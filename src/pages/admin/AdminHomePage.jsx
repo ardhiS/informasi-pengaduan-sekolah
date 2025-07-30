@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function AdminHomePage() {
 	return (
 		<div className="container mt-4 mb-5">
@@ -46,7 +48,7 @@ export default function AdminHomePage() {
 
 			<div className="row g-3 text-center">
 				<div className="col-6">
-					<a href="list-guru.html" className="text-decoration-none">
+					<Link to={"/admin/teachers/list"} className="text-decoration-none">
 						<div className="card card-hover">
 							<div className="card-body">
 								<div
@@ -54,13 +56,13 @@ export default function AdminHomePage() {
 									style={{ color: "#0d6efd", backgroundColor: "#cfe2ff" }}>
 									<i className="bi bi-person-lines-fill"></i>
 								</div>
-								<span className="fw-bold text-dark">List Guru</span>
+								<span className="fw-bold">List Guru</span>
 							</div>
 						</div>
-					</a>
+					</Link>
 				</div>
 				<div className="col-6">
-					<a href="list-siswa.html" className="text-decoration-none">
+					<Link to={"/admin/students/list"} className="text-decoration-none">
 						<div className="card card-hover">
 							<div className="card-body">
 								<div
@@ -68,13 +70,13 @@ export default function AdminHomePage() {
 									style={{ color: "#0d6efd", backgroundColor: "#cfe2ff" }}>
 									<i className="bi bi-people-fill"></i>
 								</div>
-								<span className="fw-bold text-dark">List Siswa</span>
+								<span className="fw-bold">List Siswa</span>
 							</div>
 						</div>
-					</a>
+					</Link>
 				</div>
 				<div className="col-6">
-					<a href="tambah-guru.html" className="text-decoration-none">
+					<Link to={"/admin/add/teacher"} className="text-decoration-none">
 						<div className="card card-hover">
 							<div className="card-body">
 								<div
@@ -82,13 +84,13 @@ export default function AdminHomePage() {
 									style={{ color: "#198754", backgroundColor: "#d1e7dd" }}>
 									<i className="bi bi-person-plus-fill"></i>
 								</div>
-								<span className="fw-bold text-dark">Tambah Guru</span>
+								<span className="fw-bold">Tambah Guru</span>
 							</div>
 						</div>
-					</a>
+					</Link>
 				</div>
 				<div className="col-6">
-					<a href="tambah-siswa.html" className="text-decoration-none">
+					<Link to={"/admin/add/student"} className="text-decoration-none">
 						<div className="card card-hover">
 							<div className="card-body">
 								<div
@@ -96,10 +98,10 @@ export default function AdminHomePage() {
 									style={{ color: "#198754", backgroundColor: "#d1e7dd" }}>
 									<i className="bi bi-person-plus-fill"></i>
 								</div>
-								<span className="fw-bold text-dark">Tambah Siswa</span>
+								<span className="fw-bold">Tambah Siswa</span>
 							</div>
 						</div>
-					</a>
+					</Link>
 				</div>
 			</div>
 		</div>

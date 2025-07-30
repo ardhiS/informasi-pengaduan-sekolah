@@ -18,17 +18,15 @@ import { useState } from "react";
  * <input value={nama} onChange={onNamaChange} />
  */
 
-function useInput(defaultValue = "") {
-  // State untuk menyimpan nilai input
-  const [value, setValue] = useState(defaultValue);
+export default function useInput(defaultValue = "") {
+	// State untuk menyimpan nilai input
+	const [value, setValue] = useState(defaultValue);
 
-  // Handler untuk mengubah nilai saat user mengetik
-  const onValueChangeHandler = (event) => {
-    setValue(event.target.value);
-  };
+	// Handler untuk mengubah nilai saat user mengetik
+	const onValueChangeHandler = (event) => {
+		setValue(event.target.value);
+	};
 
-  // Return array: [nilai_saat_ini, fungsi_untuk_mengubah_nilai]
-  return [value, onValueChangeHandler];
+	// Return array: [nilai_saat_ini, fungsi_untuk_mengubah_nilai]
+	return [value, onValueChangeHandler];
 }
-
-export default useInput;

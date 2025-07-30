@@ -1,19 +1,57 @@
-export default function AdminFooter() {
+import { Link, useLocation } from "react-router-dom";
+
+export default function AdminFooter({ isShortPage }) {
+	const footerClassName = `bottom-nav border-top bg-body p-2 ${
+		isShortPage ? "fixed-bottom" : "sticky-bottom"
+	}`;
+
+	const location = useLocation();
+
+	const navItems = [
+		{
+			to: "/admin/home",
+			icon: "bi bi-house-door-fill d-block",
+			label: "Beranda",
+		},
+		{
+			to: "/admin/complaints",
+			icon: "bi bi-flag-fill d-block",
+			label: "Pengaduan",
+		},
+		{ to: "/admin/features", icon: "bi bi-grid-fill d-block", label: "Fitur" },
+		{
+			to: "/admin/feedback",
+			icon: "bi bi-three-dots d-block",
+			label: "Lainnya",
+		},
+	];
+
 	return (
-		<footer className="bottom-nav bg-white p-2 sticky-bottom">
+		<footer className={footerClassName}>
 			<nav className="nav nav-fill">
-				<a className="nav-link text-muted" href="beranda.html">
+				{/* <Link to={"/admin/home"} className="nav-link text-muted">
 					<i className="bi bi-house-door-fill d-block"></i>Beranda
-				</a>
-				<a className="nav-link active" href="pengaduan.html">
+				</Link>
+				<Link to={"/admin/complaints"} className="nav-link active">
 					<i className="bi bi-flag-fill d-block"></i>Pengaduan
-				</a>
-				<a className="nav-link text-muted" href="fitur.html">
+				</Link>
+				<Link to={"/admin/features"} className="nav-link text-muted">
 					<i className="bi bi-grid-fill d-block"></i>Fitur
-				</a>
-				<a className="nav-link text-muted" href="lainnya.html">
+				</Link>
+				<Link to={"/admin/feedback"} className="nav-link text-muted">
 					<i className="bi bi-three-dots d-block"></i>Lainnya
-				</a>
+				</Link> */}
+
+				{navItems.map(({ to, icon, label }) => {
+					const isActive = location.pathname.startsWith(to);
+					const linkClass = `nav-link ${isActive ? "active" : "text-muted"}`;
+					return (
+						<Link key={to} to={to} className={linkClass}>
+							<i className={icon} />
+							{label}
+						</Link>
+					);
+				})}
 			</nav>
 		</footer>
 	);

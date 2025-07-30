@@ -101,7 +101,7 @@ export default function ConfirmationLogPage() {
 								</div>
 
 								<label className="form-label">Tindakan yang Diambil</label>
-								<div className="bg-white p-3 border rounded mb-3">
+								<div className="bg-body p-3 border rounded mb-3">
 									<div className="form-check">
 										<input
 											className="form-check-input"
@@ -173,7 +173,7 @@ export default function ConfirmationLogPage() {
 								</div>
 							</form>
 						</div>
-						<div className="card-footer bg-white text-end">
+						<div className="card-footer bg-body text-end">
 							<a
 								href="pengaduan-detail.html"
 								className="btn btn-secondary me-2">

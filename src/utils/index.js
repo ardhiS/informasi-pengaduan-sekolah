@@ -92,7 +92,7 @@ const mockUsers = [
 ];
 
 const adminAccount = {
-	username: "6789",
+	username: "admin",
 	password: "admin123",
 	name: "Admin",
 	role: "admin",
@@ -153,4 +153,22 @@ export const checkComplaint = async (complaintId) => {
 	}
 
 	return complaintTarget;
+};
+
+export const addTeacher = async (identifierNumber, fullName, subject) => {
+	await simulateApiDelay();
+
+	if (!(identifierNumber || fullName || subject)) {
+		alert("Semua input harus diisi");
+		return;
+	}
+
+	const newTeacher = {
+		nisn: identifierNumber,
+		fullName,
+		subject,
+		role: "guru",
+	};
+
+	mockUsers.push(newTeacher);
 };

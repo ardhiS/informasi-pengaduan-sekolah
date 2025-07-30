@@ -1,11 +1,13 @@
+import { Link } from "react-router-dom";
+
 export default function TeachersList() {
 	return (
 		<div className="container py-4">
 			<div className="d-flex justify-content-between align-items-center mb-4">
 				<h2 className="mb-0">Daftar Guru</h2>
-				<a href="tambah-guru.html" className="btn btn-primary">
+				<Link to={"/admin/add/teacher"} className="btn btn-primary">
 					<i className="bi bi-plus-circle me-2"></i>Tambah Guru
-				</a>
+				</Link>
 			</div>
 
 			<div className="input-group mb-4 shadow-sm">

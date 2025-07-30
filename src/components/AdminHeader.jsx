@@ -13,11 +13,10 @@ import {
 import favicon from "../assets/images/favicon-64x64.png";
 import ThemeContext from "../contexts/ThemeContext";
 
-export default function AdminHeader({ searchField, logOutButton }) {
+export default function AdminHeader({ searchField, logOutButton, isUseLogo }) {
 	const { toggleTheme } = useContext(ThemeContext);
 	// Mengambil data admin dan fungsi logout dari context auth yang telah dibuat
 	const { admin, removeAdminFromLocalStorage } = useAuth();
-	console.log(admin);
 
 	// Fungsi untuk menangani proses logout ketika tombol logout diklik
 	// Memanggil fungsi logout yang didapat dari auth context
@@ -26,7 +25,7 @@ export default function AdminHeader({ searchField, logOutButton }) {
 	};
 
 	return (
-		<header className="navbar navbar-expand-lg bg-body shadow-sm position-sticky top-0 z-1">
+		<header className="navbar navbar-expand-lg bg-body shadow-sm position-sticky top-0 z-1 ">
 			<div className="container">
 				{/* Tombol toggle untuk tampilan mobile */}
 				<button
@@ -114,22 +113,24 @@ export default function AdminHeader({ searchField, logOutButton }) {
 					</div>
 				</div>
 
-				<Link
-					to={"/admin/home"}
-					className="navbar-brand d-flex align-items-center">
-					<img
-						src={favicon}
-						alt="Logo SMP At-thahirin"
-						width="32"
-						height="32"
-						className="me-2"
-					/>
-					<span
-						className="fw-bold text-logo-gradient"
-						data-lang-id="SMP PLUS AT-THAHIRIN">
-						SMP PLUS AT-THAHIRIN
-					</span>
-				</Link>
+				{isUseLogo ? (
+					<Link
+						to={"/admin/home"}
+						className="navbar-brand d-flex align-items-center">
+						<img
+							src={favicon}
+							alt="Logo SMP At-thahirin"
+							width="32"
+							height="32"
+							className="me-2"
+						/>
+						<span
+							className="fw-bold text-logo-gradient"
+							data-lang-id="SMP PLUS AT-THAHIRIN">
+							SMP PLUS AT-THAHIRIN
+						</span>
+					</Link>
+				) : null}
 			</div>
 		</header>
 	);
