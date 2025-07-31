@@ -1,174 +1,180 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import AtThahirinLogo from "../../assets/images/favicon-128x128.png";
 import SecurityAlert from "../../components/SecurityAlert";
-// Import hook untuk mengakses context autentikasi
-import { useAuth } from "../../contexts/AuthContext";
-// Import custom hook untuk mengelola input form
 import useInput from "../../hooks/useInput";
-// Import custom hook untuk mengelola submit form
+import { useAuth } from "../../contexts/AuthContext";
 import useFormSubmit from "../../hooks/useFormSubmit";
-// Import fungsi untuk melakukan login user ke backend
-import { loginUser } from "../../utils";
+
+import {
+  login as apiLogin,
+  putAccessToken,
+  putRefreshToken,
+} from "../../utils/api";
 
 export default function LoginPage() {
-	// State untuk menyimpan nilai NISN/NIP
-	const [nisn, onNisnChange] = useInput("");
-	// State untuk menyimpan nilai password
-	const [password, onPasswordChange] = useInput("");
-	// State untuk mengelola status loading dan submit form
-	const [loading, handleSubmit] = useFormSubmit();
-	// State untuk menampilkan pesan error
-	const [error, setError] = useState("");
+  const [nisn, onNisnChange] = useInput("");
+  const [password, onPasswordChange] = useInput("");
+  const [loading, handleSubmit] = useFormSubmit();
+  const [error, setError] = useState("");
 
-	// Mengambil fungsi login dari context autentikasi
-	const { login } = useAuth();
-	// Hook untuk navigasi halaman
-	const navigate = useNavigate();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-	// Handler untuk submit form login
-	const onSubmit = async (event) => {
-		// Mencegah form melakukan refresh halaman
-		event.preventDefault();
-		// Reset pesan error
-		setError("");
-		// Menjalankan proses login
-		await handleSubmit(async () => {
-			// Memanggil API login
-			const result = await loginUser(nisn, password);
+  // Logika onSubmit
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
 
-			// Jika login berhasil
-			if (result.success) {
-				// Set data user ke context
-				login(result.user);
-				// Redirect ke halaman utama
-				navigate("/user/home");
-			} else {
-				// Jika gagal, tampilkan pesan error
-				setError(result.error);
-			}
-		});
-	};
-	return (
-		<>
-			<div className="card px-5 py-3 card-login shadow border">
-				<div className="text-center mb-4">
-					<img
-						className="logo-login mb-3"
-						src={AtThahirinLogo}
-						alt="Logo Sistem Pengaduan"
-					/>
-					<h1
-						className="h4 mb-1 fw-bold text-success"
-						data-lang-id="SISTEM INFORMASI">
-						SISTEM INFORMASI
-					</h1>
-					<h2
-						className="h5 mb-2 fw-bold text-info"
-						data-lang-id="PENGADUAN ONLINE">
-						PENGADUAN ONLINE
-					</h2>
-				</div>
+    await handleSubmit(async () => {
+      // Panggil API login
+      const result = await apiLogin({ username: nisn, password });
 
-				{/* <!-- Pesan error --> */}
-				{error && (
-					<div className="alert alert-danger mb-3" role="alert">
-						{error}
-					</div>
-				)}
+      // Periksa status respon dari API
+      if (result.status === "success") {
+        // Simpan token dari data respon
+        putAccessToken(result.data.accessToken);
+        putRefreshToken(result.data.refreshToken);
 
-				{/* <!-- Form login --> */}
-				<form onSubmit={onSubmit}>
-					{/* <!-- Input NISN/NIP --> */}
-					<div className="mb-3">
-						<label
-							htmlFor="nisn"
-							className="form-label fw-semibold text-body mb-2"
-							data-lang-id="NISN/NIP">
-							NISN/NIP
-						</label>
-						<div className="form-floating">
-							<input
-								type="text"
-								className="form-control"
-								id="nisn"
-								placeholder="Masukan NISN/NIP anda"
-								value={nisn}
-								onChange={onNisnChange}
-								required
-							/>
-							<label
-								htmlFor="nisn"
-								className="text-muted"
-								data-lang-id="Masukan NISN/NIP anda">
-								Masukan NISN/NIP anda
-							</label>
-						</div>
-					</div>
-					{/* <!-- Input password --> */}
-					<div className="mb-3">
-						<label
-							htmlFor="password"
-							className="form-label fw-semibold text-body mb-2"
-							data-lang-id="Kata Sandi">
-							Kata Sandi
-						</label>
-						<div className="form-floating">
-							<input
-								type="password"
-								className="form-control"
-								id="password"
-								placeholder="Masukan kata sandi anda"
-								value={password}
-								onChange={onPasswordChange}
-								required
-							/>
-							<label
-								htmlFor="password"
-								className="text-muted"
-								data-lang-id="Masukan kata sandi anda">
-								Masukan kata sandi anda
-							</label>
-						</div>
-					</div>
+        // Langsung gunakan data user dari respon login untuk di-set ke context
+        // Tidak perlu lagi memanggil getUserLogged()
+        login(result.data.user);
 
-					{/* <!-- Checkbox "Ingatkan saya" dan link "Lupa kata sandi" --> */}
-					<div className="d-flex justify-content-between align-items-center mb-3">
-						<div className="form-check">
-							<input
-								className="form-check-input"
-								type="checkbox"
-								value=""
-								id="ingatkanSaya"
-							/>
-							<label
-								className="form-check-label"
-								htmlFor="ingatkanSaya"
-								data-lang-id="Ingatkan saya">
-								Ingatkan saya
-							</label>
-						</div>
-						<a
-							href="#"
-							className="small text-decoration-none text-info"
-							data-lang-id="Lupa kata sandi?">
-							Lupa kata sandi?
-						</a>
-					</div>
+        // Arahkan pengguna berdasarkan peran (opsional) atau ke halaman utama
+        if (result.data.user.role === "admin") {
+          navigate("/admin/dashboard"); // Contoh navigasi untuk admin
+        } else {
+          navigate("/user/home"); // Navigasi untuk siswa atau guru
+        }
+      } else {
+        // Jika gagal, tampilkan pesan error dari server
+        setError(result.message || "NISN/NIP atau Password salah.");
+      }
+    });
+  };
 
-					{/* <!-- Tombol submit --> */}
-					<button
-						className="w-100 btn btn-lg btn-info"
-						type="submit"
-						data-lang-id="Masuk">
-						{loading ? "Memproses...." : "Masuk"}
-					</button>
-				</form>
-			</div>
+  return (
+    <>
+      <div className="card px-5 py-3 card-login shadow border">
+        <div className="text-center mb-4">
+          <img
+            className="logo-login mb-3"
+            src={AtThahirinLogo}
+            alt="Logo Sistem Pengaduan"
+          />
+          <h1
+            className="h4 mb-1 fw-bold text-success"
+            data-lang-id="SISTEM INFORMASI"
+          >
+            SISTEM INFORMASI
+          </h1>
+          <h2
+            className="h5 mb-2 fw-bold text-info"
+            data-lang-id="PENGADUAN ONLINE"
+          >
+            PENGADUAN ONLINE
+          </h2>
+        </div>
 
-			{/* <!-- Alert informasi keamanan --> */}
-			<SecurityAlert />
-		</>
-	);
+        {error && (
+          <div className="alert alert-danger mb-3" role="alert">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={onSubmit}>
+          <div className="mb-3">
+            <label
+              htmlFor="nisn"
+              className="form-label fw-semibold text-body mb-2"
+              data-lang-id="NISN/NIP"
+            >
+              NISN/NIP
+            </label>
+            <div className="form-floating">
+              <input
+                type="text"
+                className="form-control"
+                id="nisn"
+                placeholder="Masukan NISN/NIP anda"
+                value={nisn}
+                onChange={onNisnChange}
+                required
+              />
+              <label
+                htmlFor="nisn"
+                className="text-muted"
+                data-lang-id="Masukan NISN/NIP anda"
+              >
+                Masukan NISN/NIP anda
+              </label>
+            </div>
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="password"
+              className="form-label fw-semibold text-body mb-2"
+              data-lang-id="Kata Sandi"
+            >
+              Kata Sandi
+            </label>
+            <div className="form-floating">
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                placeholder="Masukan kata sandi anda"
+                value={password}
+                onChange={onPasswordChange}
+                required
+              />
+              <label
+                htmlFor="password"
+                className="text-muted"
+                data-lang-id="Masukan kata sandi anda"
+              >
+                Masukan kata sandi anda
+              </label>
+            </div>
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                value=""
+                id="ingatkanSaya"
+              />
+              <label
+                className="form-check-label"
+                htmlFor="ingatkanSaya"
+                data-lang-id="Ingatkan saya"
+              >
+                Ingatkan saya
+              </label>
+            </div>
+            <a
+              href="#"
+              className="small text-decoration-none text-info"
+              data-lang-id="Lupa kata sandi?"
+            >
+              Lupa kata sandi?
+            </a>
+          </div>
+
+          <button
+            className="w-100 btn btn-lg btn-info"
+            type="submit"
+            data-lang-id="Masuk"
+          >
+            {loading ? "Memproses...." : "Masuk"}
+          </button>
+        </form>
+      </div>
+
+      <SecurityAlert />
+    </>
+  );
 }
