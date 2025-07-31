@@ -42,7 +42,7 @@ export default function ComplaintCheckPage() {
 								Masukkan Kode Pengaduan
 							</h3>
 
-							<form action="#" method="GET">
+							<form onSubmit={handleSubmit}>
 								<div className="mb-5">
 									<label
 										htmlFor="kodePengaduan"
@@ -72,20 +72,10 @@ export default function ComplaintCheckPage() {
 									<div className="col-md-6">
 										<button
 											type="submit"
-											className="btn btn-info btn-lg w-100 py-3 fw-semibold rounded-3 shadow-sm"
-											onClick={handleSubmit}>
+											className="btn btn-info btn-lg w-100 py-3 fw-semibold rounded-3 shadow-sm">
 											<i className="bi bi-search me-2 fs-5"></i>Cari Pengaduan
 										</button>
 									</div>
-								</div>
-
-								<div className="text-center mt-4">
-									<a
-										href="#"
-										className="small text-decoration-none text-info fw-medium">
-										<i className="bi bi-question-circle me-1"></i>Lupa kode
-										pengaduan?
-									</a>
 								</div>
 							</form>
 						</div>

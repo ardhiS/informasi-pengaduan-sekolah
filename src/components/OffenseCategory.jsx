@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 export default function OffenseCategory({
 	category,
@@ -30,3 +31,8 @@ export default function OffenseCategory({
 		</>
 	);
 }
+
+OffenseCategory.propTypes = {
+	category: PropTypes.string.isRequired,
+	isChecked: PropTypes.bool.isRequired,
+};

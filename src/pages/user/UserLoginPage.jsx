@@ -1,11 +1,12 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import AtThahirinLogo from "../../assets/images/favicon-128x128.png";
 import SecurityAlert from "../../components/SecurityAlert";
 import useInput from "../../hooks/useInput";
 import { useAuth } from "../../contexts/AuthContext";
 import useFormSubmit from "../../hooks/useFormSubmit";
+import { HiArrowNarrowLeft } from "react-icons/hi";
 
 import {
 	login as apiLogin,
@@ -159,6 +160,11 @@ export default function LoginPage() {
 						data-lang-id="Masuk">
 						{loading ? "Memproses...." : "Masuk"}
 					</button>
+
+					<Link to={"/"} className="btn btn-outline-info btn-lg mt-3 w-100">
+						<HiArrowNarrowLeft className="fs-4 mx-2" />
+						Kembali
+					</Link>
 				</form>
 			</div>
 

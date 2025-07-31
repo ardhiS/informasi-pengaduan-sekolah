@@ -12,6 +12,7 @@ import {
 
 import favicon from "../assets/images/favicon-64x64.png";
 import ThemeContext from "../contexts/ThemeContext";
+import PropTypes from "prop-types";
 
 export default function UserHeader({ searchField, logOutButton }) {
 	const { toggleTheme } = useContext(ThemeContext);
@@ -126,3 +127,8 @@ export default function UserHeader({ searchField, logOutButton }) {
 		</header>
 	);
 }
+
+UserHeader.propTypes = {
+	searchField: PropTypes.bool,
+	logOutButton: PropTypes.bool,
+};

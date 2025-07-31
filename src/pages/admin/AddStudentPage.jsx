@@ -1,4 +1,32 @@
+import useInput from "../../hooks/useInput";
+import useFormSubmit from "../../hooks/useFormSubmit";
+import { addUser } from "../../utils/api";
+
 export default function AddStudentPage() {
+	const [nisn, onNisnChange] = useInput();
+	const [password, onPasswordChange] = useInput();
+	const [fullname, onFullnameChange] = useInput();
+	const [loading, handleSubmit] = useFormSubmit();
+
+	const submitHandler = async (event) => {
+		event.preventDefault();
+
+		await handleSubmit(async () => {
+			const { error } = await addUser({
+				identifierNumber: nisn,
+				password,
+				fullname,
+				role: "siswa",
+			});
+			if (error) {
+				alert("Gagal menambahkan user");
+				return;
+			}
+
+			alert(`Guru dengan NISN ${nisn} berhasil ditambahkan`);
+		});
+	};
+
 	return (
 		<div className="container py-4">
 			<div className="card shadow-sm">
@@ -6,7 +34,7 @@ export default function AddStudentPage() {
 					<h5 className="mb-0">Formulir Data Siswa</h5>
 				</div>
 				<div className="card-body">
-					<form id="form-tambah-siswa">
+					<form id="form-tambah-siswa" onSubmit={submitHandler}>
 						<div className="mb-3">
 							<label htmlFor="nisn" className="form-label">
 								NISN
@@ -20,6 +48,27 @@ export default function AddStudentPage() {
 									className="form-control"
 									id="nisn"
 									placeholder="Masukkan NISN siswa"
+									value={nisn}
+									onChange={onNisnChange}
+									required
+								/>
+							</div>
+						</div>
+						<div className="mb-3">
+							<label htmlFor="nama" className="form-label">
+								Password
+							</label>
+							<div className="input-group">
+								<span className="input-group-text">
+									<i className="bi bi-person-fill"></i>
+								</span>
+								<input
+									type="text"
+									className="form-control"
+									id="nama"
+									placeholder="Masukkan nama lengkap"
+									value={password}
+									onChange={onPasswordChange}
 									required
 								/>
 							</div>
@@ -37,41 +86,8 @@ export default function AddStudentPage() {
 									className="form-control"
 									id="nama"
 									placeholder="Masukkan nama lengkap"
-									required
-								/>
-							</div>
-						</div>
-						<div className="mb-3">
-							<label htmlFor="kelas" className="form-label">
-								Kelas
-							</label>
-							<div className="input-group">
-								<span className="input-group-text">
-									<i className="bi bi-easel-fill"></i>
-								</span>
-								<select
-									className="form-select"
-									id="kelas"
-									required
-									defaultValue={"1"}>
-									<option value={"1"}>X IPA 1</option>
-									<option value={"2"}>XI IPS 2</option>
-									<option value={"3"}>XII BAHASA</option>
-								</select>
-							</div>
-						</div>
-						<div className="mb-3">
-							<label htmlFor="tgl_lahir" className="form-label">
-								Tanggal Lahir
-							</label>
-							<div className="input-group">
-								<span className="input-group-text">
-									<i className="bi bi-calendar-event"></i>
-								</span>
-								<input
-									type="date"
-									className="form-control"
-									id="tgl_lahir"
+									value={fullname}
+									onChange={onFullnameChange}
 									required
 								/>
 							</div>
@@ -86,7 +102,8 @@ export default function AddStudentPage() {
 						type="submit"
 						form="form-tambah-siswa"
 						className="btn btn-primary">
-						<i className="bi bi-save me-2"></i>Simpan Data
+						<i className="bi bi-save me-2"></i>
+						{loading ? "menyimpan..." : "Simpan Data"}
 					</button>
 				</div>
 			</div>

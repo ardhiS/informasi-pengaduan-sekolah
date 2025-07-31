@@ -2,18 +2,13 @@ import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // Import hook useAuth dari AuthContext untuk mengakses data admin dan fungsi autentikasi
 import { useAuth } from "../contexts/AuthContext";
-import {
-	BsSearch,
-	BsGlobe,
-	BsGeoAltFill,
-	BsMoonStars,
-	BsPersonCircle,
-} from "react-icons/bs";
+import { BsGlobe, BsGeoAltFill, BsMoonStars } from "react-icons/bs";
 
 import favicon from "../assets/images/favicon-64x64.png";
 import ThemeContext from "../contexts/ThemeContext";
+import PropTypes from "prop-types";
 
-export default function AdminHeader({ searchField, logOutButton, isUseLogo }) {
+export default function AdminHeader({ logOutButton, isUseLogo }) {
 	const { toggleTheme } = useContext(ThemeContext);
 	// Mengambil data admin dan fungsi logout dari context auth yang telah dibuat
 	const { admin, adminLogout } = useAuth();
@@ -40,25 +35,6 @@ export default function AdminHeader({ searchField, logOutButton, isUseLogo }) {
 
 				<div className="collapse navbar-collapse" id="navbarNav">
 					<div className="d-flex align-items-center gap-3">
-						{/* <!-- Form pencarian --> */}
-
-						{searchField && (
-							<form className="d-flex" role="search">
-								<input
-									className="form-control form-control-sm"
-									type="search"
-									placeholder="Cari..."
-									data-lang-id="Cari..."
-								/>
-								<button
-									className="btn btn-info btn-sm ms-1 d-flex align-items-center"
-									type="submit"
-									style={{ height: "31px" }}>
-									<BsSearch />
-								</button>
-							</form>
-						)}
-
 						{/*Dropdown pemilihan bahasa*/}
 						<div className="dropdown">
 							<button
@@ -100,10 +76,7 @@ export default function AdminHeader({ searchField, logOutButton, isUseLogo }) {
             */}
 						{logOutButton && admin && (
 							<div className="d-flex align-items-center gap-2">
-								<span className="text-muted small d-none d-md-inline">
-									<BsPersonCircle className="me-1" />
-									{admin.name}
-								</span>
+								<span className="text-muted small d-none d-md-inline"></span>
 								<button
 									onClick={handleLogout}
 									className="btn btn-outline-danger btn-sm"
@@ -137,3 +110,8 @@ export default function AdminHeader({ searchField, logOutButton, isUseLogo }) {
 		</header>
 	);
 }
+
+AdminHeader.propTypes = {
+	logOutButton: PropTypes.bool,
+	isUseLogo: PropTypes.bool,
+};

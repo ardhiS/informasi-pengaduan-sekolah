@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import useInput from "../../hooks/useInput";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import { useAuth } from "../../contexts/AuthContext";
@@ -8,6 +8,7 @@ import {
 	putAccessToken,
 	putRefreshToken,
 } from "../../utils/api";
+import { HiArrowNarrowLeft } from "react-icons/hi";
 
 export default function AdminLoginPage() {
 	const [username, onChangeUsername] = useInput();
@@ -117,6 +118,13 @@ export default function AdminLoginPage() {
 								{loading ? "Memproses..." : "Masuk"}
 							</button>
 						</div>
+
+						<Link
+							to={"/"}
+							className="btn btn-outline-primary btn-lg mt-3 w-100">
+							<HiArrowNarrowLeft className="fs-4 mx-2" />
+							Kembali
+						</Link>
 					</form>
 				</div>
 			</div>

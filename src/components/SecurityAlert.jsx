@@ -9,9 +9,9 @@ export default function SecurityAlert() {
 					</strong>
 					,{" "}
 					<a
-						href="#"
-						className="text-decoration-underline link-custom"
-						data-lang-id="Pelajari lebih lanjut tentang anonimitas">
+						href="https://id.wikipedia.org/wiki/Anonimitas"
+						target="_blank"
+						className="text-decoration-underline link-custom">
 						Pelajari lebih lanjut tentang anonimitas
 					</a>
 				</div>

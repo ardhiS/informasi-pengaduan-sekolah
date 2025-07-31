@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
 export default function AdminFooter({ isShortPage }) {
 	const footerClassName = `bottom-nav border-top bg-body p-2 ${
@@ -29,19 +30,6 @@ export default function AdminFooter({ isShortPage }) {
 	return (
 		<footer className={footerClassName}>
 			<nav className="nav nav-fill">
-				{/* <Link to={"/admin/home"} className="nav-link text-muted">
-					<i className="bi bi-house-door-fill d-block"></i>Beranda
-				</Link>
-				<Link to={"/admin/complaints"} className="nav-link active">
-					<i className="bi bi-flag-fill d-block"></i>Pengaduan
-				</Link>
-				<Link to={"/admin/features"} className="nav-link text-muted">
-					<i className="bi bi-grid-fill d-block"></i>Fitur
-				</Link>
-				<Link to={"/admin/feedback"} className="nav-link text-muted">
-					<i className="bi bi-three-dots d-block"></i>Lainnya
-				</Link> */}
-
 				{navItems.map(({ to, icon, label }) => {
 					const isActive = location.pathname.startsWith(to);
 					const linkClass = `nav-link ${isActive ? "active" : "text-muted"}`;
@@ -56,3 +44,7 @@ export default function AdminFooter({ isShortPage }) {
 		</footer>
 	);
 }
+
+AdminFooter.propTypes = {
+	isShortPage: PropTypes.bool.isRequired,
+};
