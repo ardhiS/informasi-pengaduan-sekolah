@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // Import hook useAuth dari AuthContext untuk mengakses data admin dan fungsi autentikasi
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -16,12 +16,14 @@ import ThemeContext from "../contexts/ThemeContext";
 export default function AdminHeader({ searchField, logOutButton, isUseLogo }) {
 	const { toggleTheme } = useContext(ThemeContext);
 	// Mengambil data admin dan fungsi logout dari context auth yang telah dibuat
-	const { admin, removeAdminFromLocalStorage } = useAuth();
+	const { admin, adminLogout } = useAuth();
+	const navigate = useNavigate();
 
 	// Fungsi untuk menangani proses logout ketika tombol logout diklik
 	// Memanggil fungsi logout yang didapat dari auth context
 	const handleLogout = () => {
-		removeAdminFromLocalStorage();
+		adminLogout();
+		navigate("/admin");
 	};
 
 	return (

@@ -76,20 +76,24 @@ export function AuthProvider({ children }) {
 		localStorage.setItem("user", JSON.stringify(userData));
 	};
 
-	// Fungsi untuk melakukan logout
-	const logout = () => {
-		setUser(null);
-		localStorage.removeItem("user");
-	};
-
-	const saveAdminToLocalStorage = (adminData) => {
+	const adminLogin = (adminData) => {
 		setAdmin(adminData);
 		localStorage.setItem("admin", JSON.stringify(adminData));
 	};
 
-	const removeAdminFromLocalStorage = () => {
+	// Fungsi untuk melakukan logout
+	const logout = () => {
+		setUser(null);
+		localStorage.removeItem("user");
+		localStorage.removeItem("accessToken");
+		localStorage.removeItem("refreshToken");
+	};
+
+	const adminLogout = () => {
 		setAdmin(null);
 		localStorage.removeItem("admin");
+		localStorage.removeItem("accessToken");
+		localStorage.removeItem("refreshToken");
 	};
 
 	return (
@@ -98,10 +102,10 @@ export function AuthProvider({ children }) {
 				user,
 				loading,
 				login,
+				adminLogin,
 				logout,
+				adminLogout,
 				admin,
-				saveAdminToLocalStorage,
-				removeAdminFromLocalStorage,
 			}}>
 			{children}
 		</AuthContext.Provider>

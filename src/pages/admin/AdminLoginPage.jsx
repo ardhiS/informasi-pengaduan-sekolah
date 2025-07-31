@@ -2,47 +2,44 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useInput from "../../hooks/useInput";
 import useFormSubmit from "../../hooks/useFormSubmit";
-// import { loginAdmin } from "../../utils";
-// import { useAuth } from "../../contexts/AuthContext";
-
+import { useAuth } from "../../contexts/AuthContext";
 import {
-	login,
+	login as apiLogin,
 	putAccessToken,
 	putRefreshToken,
-} from "../../utils/network-data";
+} from "../../utils/api";
 
 export default function AdminLoginPage() {
 	const [username, onChangeUsername] = useInput();
 	const [password, onChangePassword] = useInput();
 	const [loading, handleSubmit] = useFormSubmit();
 	const [error, setError] = useState("");
+
+	const { adminLogin } = useAuth();
 	const navigate = useNavigate();
 
-	const submitHandler = async (event) => {
+	// Logika onSubmit
+	const onSubmit = async (event) => {
 		event.preventDefault();
-		// await handleSubmit(async () => {
-		// 	const result = await loginAdmin(username, password);
-		// 	console.log(result);
-		// 	if (!result.success) {
-		// 		setError(result.error);
-		// 		return;
-		// 	}
-		// 	saveAdminToLocalStorage(result.admin);
-		// 	console.log("Admin after save:", result); // ✅ log ini
-		// 	navigate("/admin/home");
-		// 	console.log("Navigate");
-		// });
+		setError("");
 
 		await handleSubmit(async () => {
-			const { error, data } = await login({ username, password });
+			// Panggil API login
+			const result = await apiLogin({ username, password });
 
-			if (error || !data?.accessToken || !data?.refreshToken) {
-				setError("Username atau Password salah");
+			if (result.status !== "success") {
+				setError(result.message || "NISN/NIP atau Password salah.");
 				return;
 			}
-			putAccessToken(data.accessToken);
-			putRefreshToken(data.refreshToken);
 
+			if (result.data.user.role !== "admin") {
+				setError("Hanya admin yang boleh login di halaman ini");
+				return;
+			}
+
+			putAccessToken(result.data.accessToken);
+			putRefreshToken(result.data.refreshToken);
+			adminLogin(result.data.user);
 			navigate("/admin/home");
 		});
 	};
@@ -61,7 +58,7 @@ export default function AdminLoginPage() {
 						</div>
 					)}
 
-					<form onSubmit={submitHandler}>
+					<form onSubmit={onSubmit}>
 						<div className="input-group mb-3">
 							<span className="input-group-text">
 								<i className="bi bi-person"></i>
