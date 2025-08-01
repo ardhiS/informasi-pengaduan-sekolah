@@ -14,6 +14,7 @@ export default function ListComplaintsPage() {
 	useEffect(() => {
 		const fetchComplaints = async () => {
 			const result = await getPublicComplaints();
+			console.log(result);
 			if (result.status === "success") {
 				const sorted = result.data.complaints.sort(
 					(a, b) => new Date(b.reported_at) - new Date(a.reported_at)
@@ -27,6 +28,21 @@ export default function ListComplaintsPage() {
 
 		fetchComplaints();
 	}, []);
+
+	const defineStatusClass = (status) => {
+		switch (status.toLowerCase()) {
+			case "pending_approval":
+				return "bg-warning text-dark";
+			case "in_progress":
+				return "bg-primary text-white";
+			case "resolved":
+				return "bg-success text-white";
+			case "rejected":
+				return "bg-danger text-white";
+			default:
+				return null;
+		}
+	};
 
 	const categories = [
 		"all",
@@ -121,7 +137,10 @@ export default function ListComplaintsPage() {
 												<span className="badge bg-info text-capitalize">
 													{complaint.category}
 												</span>
-												<span className="badge bg-warning text-dark text-capitalize">
+												<span
+													className={`badge ${defineStatusClass(
+														complaint.status
+													)} text-capitalize`}>
 													{complaint.status}
 												</span>
 											</div>

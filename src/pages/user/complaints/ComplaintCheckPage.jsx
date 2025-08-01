@@ -10,7 +10,7 @@ export default function ComplaintCheckPage() {
 	function handleSubmit(e) {
 		e.preventDefault();
 		const complaintId = inputComplaintId;
-		navigate(`/user/complaints/detail/${complaintId}`);
+		navigate(`/user/complaint/details/${complaintId}`);
 	}
 
 	return (
@@ -87,7 +87,8 @@ export default function ComplaintCheckPage() {
 					<i className="bi bi-house me-2"></i>Kembali ke Beranda
 				</Link>
 				<Link to="/user/complaints/list" className="btn btn-info">
-					<i className="bi bi-card-list me-2"></i>Lihat Semua Pengaduan
+					<i className="bi bi-card-list me-2" />
+					Lihat Semua Pengaduan
 				</Link>
 			</div>
 			<SecurityAlert />

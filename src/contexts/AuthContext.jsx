@@ -61,10 +61,21 @@ export function AuthProvider({ children }) {
 		const savedAdmin = localStorage.getItem("admin");
 
 		if (savedUser) {
-			setUser(JSON.parse(savedUser));
+			try {
+				setUser(JSON.parse(savedUser));
+			} catch (error) {
+				console.error("Gagal parsing user:", error);
+				localStorage.removeItem("user"); // bersihkan yang rusak
+			}
 		}
+
 		if (savedAdmin) {
-			setAdmin(JSON.parse(savedAdmin));
+			try {
+				setAdmin(JSON.parse(savedAdmin));
+			} catch (error) {
+				console.error("Gagal parsing admin:", error);
+				localStorage.removeItem("admin"); // bersihkan yang rusak
+			}
 		}
 
 		setLoading(false);

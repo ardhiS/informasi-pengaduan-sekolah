@@ -3,7 +3,7 @@ import {
 	BsCheckCircleFill,
 	BsPlusCircleFill,
 	BsSearch,
-	BsShieldFillCheck,
+	BsCardList,
 } from "react-icons/bs";
 import { Link } from "react-router-dom";
 
@@ -109,19 +109,19 @@ function HomePage() {
 
 						{/* <!-- Tombol aksi --> */}
 						<div className="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-							{/* <button
-								onClick={handleCreateComplaint}
-								className="btn btn-info btn-lg px-4 d-flex align-items-center gap-2"
-								type="button">
-								<BsPlusCircleFill />
+							<Link
+								to={"/user/complaints/list"}
+								className="btn btn-info btn-lg px-4 d-flex align-items-center gap-2">
+								<BsCardList />
+								<span data-lang-id="Buat Pengaduan">List Pengaduan</span>
+							</Link>
+						</div>
 
-								<span data-lang-id="Buat Pengaduan">Buat Pengaduan</span>
-							</button> */}
-
+						<div className="d-grid gap-2 d-sm-flex justify-content-sm-center mt-3">
 							{/* Menggunakan Link dari react-router-dom */}
 							<Link
 								to={"/user/complaints/form"}
-								className="btn btn-info btn-lg px-4 d-flex align-items-center gap-2">
+								className="btn btn-outline-info btn-lg px-4 d-flex align-items-center gap-2">
 								<BsPlusCircleFill />
 								<span data-lang-id="Buat Pengaduan">Buat Pengaduan</span>
 							</Link>
