@@ -1,59 +1,38 @@
-import { useEffect, useState } from "react";
+// src/layouts/AdminLayout.jsx (VERSI BARU YANG LEBIH BAIK)
+
 import { Outlet, useLocation } from "react-router-dom";
 import AdminHeader from "../components/AdminHeader";
 import AdminFooter from "../components/AdminFooter";
 
 export default function AdminLayout() {
-	const [pageHeight, setPageHeight] = useState();
-	const location = useLocation();
+  const location = useLocation();
 
-	useEffect(() => {
-		function checkHeight() {
-			const contentHeight = document.documentElement.scrollHeight;
-			const viewportHeight = window.innerHeight;
-			setPageHeight(contentHeight <= viewportHeight);
-		}
+  // Hanya untuk membedakan halaman login, tanpa logika tinggi halaman
+  const isLoginPage =
+    location.pathname === "/admin" || location.pathname === "/admin/";
 
-		requestAnimationFrame(() => {
-			requestAnimationFrame(checkHeight);
-		});
-		window.addEventListener("resize", checkHeight);
+  if (isLoginPage) {
+    // Halaman login tidak memerlukan layout sticky footer
+    return (
+      <>
+        <AdminHeader />
+        <main>
+          <Outlet />
+        </main>
+      </>
+    );
+  }
 
-		return () => window.removeEventListener("resize", checkHeight);
-	}, []);
-
-	useEffect(() => {
-		function checkHeight() {
-			const contentHeight = document.documentElement.scrollHeight;
-			const viewportHeight = window.innerHeight;
-			setPageHeight(contentHeight <= viewportHeight);
-		}
-
-		requestAnimationFrame(() => {
-			requestAnimationFrame(checkHeight);
-		});
-	}, [location.pathname]);
-
-	const isLoginPage =
-		location.pathname === "/admin" || location.pathname === "/admin/";
-
-	if (isLoginPage) {
-		return (
-			<>
-				<AdminHeader />
-				<main>
-					<Outlet />
-				</main>
-			</>
-		);
-	}
-	return (
-		<>
-			<AdminHeader isUseLogo logOutButton />
-			<main className="mb-3">
-				<Outlet />
-			</main>
-			<AdminFooter isShortPage={pageHeight} />
-		</>
-	);
+  // Layout utama untuk semua halaman admin lainnya
+  return (
+    // Tambahkan div pembungkus dengan class untuk styling
+    <div className="admin-layout-wrapper">
+      <AdminHeader isUseLogo logOutButton />
+      {/* Beri class pada main untuk membuatnya fleksibel */}
+      <main className="admin-main-content">
+        <Outlet />
+      </main>
+      <AdminFooter />
+    </div>
+  );
 }
