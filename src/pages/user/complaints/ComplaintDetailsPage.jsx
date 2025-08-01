@@ -129,7 +129,7 @@ export default function ComplaintDetailPage() {
                   complaintData.images.map((image) => {
                     const imageUrl = image.imageUrl.replace(
                       "undefined",
-                      "https://happy-corners-return-mysteriously.a276.dcdg.xyz"
+                      "http://3.27.88.145:5000"
                     );
                     return (
                       <div className="card mb-2" key={image.id}>
