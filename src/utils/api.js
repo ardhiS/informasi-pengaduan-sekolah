@@ -328,6 +328,18 @@ async function rejectComplaint(id, payload) {
   return response.json();
 }
 
+/**
+ * Menghapus pengguna berdasarkan ID.
+ * @param {string} id - User ID
+ * @returns {Promise<object>}
+ */
+async function deleteUser(id) {
+  const response = await fetchWithToken(`${BASE_URL}/api/users/${id}`, {
+    method: "DELETE",
+  });
+  return response.json();
+}
+
 // Export semua fungsi agar bisa digunakan di komponen lain
 export {
   // Helpers
@@ -346,6 +358,7 @@ export {
   // Users
   getUsers,
   getUserDetails,
+  deleteUser,
 
   // Complaints
   createComplaint,
