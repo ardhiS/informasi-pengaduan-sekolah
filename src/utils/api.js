@@ -1,22 +1,22 @@
 // Alamat dasar dari server backend Anda
-const BASE_URL = "http://3.27.88.145:5000";
+const BASE_URL = 'https://happy-corners-return-mysteriously.a276.dcdg.xyz';
 
 // --- Fungsi Helper untuk Mengelola Token ---
 
 function getAccessToken() {
-  return localStorage.getItem("accessToken");
+  return localStorage.getItem('accessToken');
 }
 
 function putAccessToken(accessToken) {
-  return localStorage.setItem("accessToken", accessToken);
+  return localStorage.setItem('accessToken', accessToken);
 }
 
 function getRefreshToken() {
-  return localStorage.getItem("refreshToken");
+  return localStorage.getItem('refreshToken');
 }
 
 function putRefreshToken(refreshToken) {
-  return localStorage.setItem("refreshToken", refreshToken);
+  return localStorage.setItem('refreshToken', refreshToken);
 }
 
 // Fungsi pembantu untuk fetch dengan token otentikasi
@@ -36,7 +36,7 @@ function buildQueryString(params) {
     .map(
       (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
     )
-    .join("&");
+    .join('&');
 }
 
 // --- 1. AUTHENTICATION API ---
@@ -48,8 +48,8 @@ function buildQueryString(params) {
  */
 async function login({ username, password }) {
   const response = await fetch(`${BASE_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
   return response.json();
@@ -62,8 +62,8 @@ async function login({ username, password }) {
  */
 async function register(userData) {
   const response = await fetch(`${BASE_URL}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(userData),
   });
   return response.json();
@@ -75,12 +75,12 @@ async function register(userData) {
 async function logout() {
   // Menggunakan endpoint legacy DELETE /api/authentications
   await fetchWithToken(`${BASE_URL}/api/authentications`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ refreshToken: getRefreshToken() }),
   });
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
 }
 
 /**
@@ -89,8 +89,8 @@ async function logout() {
  */
 async function refreshAuthToken() {
   const response = await fetch(`${BASE_URL}/api/auth/refresh`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ refreshToken: getRefreshToken() }),
   });
   return response.json();
@@ -149,7 +149,7 @@ async function getUserDetails(id) {
 async function createComplaint(formData) {
   // fetchWithToken tidak bisa langsung dipakai karena header 'Content-Type' diatur otomatis oleh browser untuk FormData
   const response = await fetch(`${BASE_URL}/api/complaints`, {
-    method: "POST",
+    method: 'POST',
     headers: {
       Authorization: `Bearer ${getAccessToken()}`,
       // JANGAN SET 'Content-Type': 'multipart/form-data', browser akan melakukannya
@@ -203,8 +203,8 @@ async function updateComplaintStatus(id, payload) {
   const response = await fetchWithToken(
     `${BASE_URL}/api/complaints/${id}/status`,
     {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }
   );
@@ -221,8 +221,8 @@ async function assignComplaint(id, payload) {
   const response = await fetchWithToken(
     `${BASE_URL}/api/complaints/${id}/assign`,
     {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }
   );
@@ -234,18 +234,18 @@ async function assignComplaint(id, payload) {
 // Menambahkan user melalui akun admin
 async function addUser({ identifierNumber, password, fullname, role }) {
   const payload = { username: identifierNumber, password, fullname, role };
-  console.log("Token saat ini:", getAccessToken());
+  console.log('Token saat ini:', getAccessToken());
   const response = await fetchWithToken(`${BASE_URL}/api/users`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),
   });
 
   const responseJson = await response.json();
 
-  if (responseJson.status !== "success") {
+  if (responseJson.status !== 'success') {
     return { error: true, data: null };
   }
 
@@ -273,8 +273,8 @@ async function getComplaints(params = {}) {
  */
 async function updateComplaint(id, complaintData) {
   const response = await fetchWithToken(`${BASE_URL}/api/complaints/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(complaintData),
   });
   return response.json();
@@ -287,7 +287,7 @@ async function updateComplaint(id, complaintData) {
  */
 async function deleteComplaint(id) {
   const response = await fetchWithToken(`${BASE_URL}/api/complaints/${id}`, {
-    method: "DELETE",
+    method: 'DELETE',
   });
   return response.json();
 }
@@ -302,8 +302,8 @@ async function approveComplaint(id, payload) {
   const response = await fetchWithToken(
     `${BASE_URL}/api/complaints/${id}/approve`,
     {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }
   );
@@ -320,8 +320,8 @@ async function rejectComplaint(id, payload) {
   const response = await fetchWithToken(
     `${BASE_URL}/api/complaints/${id}/reject`,
     {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }
   );
@@ -335,7 +335,7 @@ async function rejectComplaint(id, payload) {
  */
 async function deleteUser(id) {
   const response = await fetchWithToken(`${BASE_URL}/api/users/${id}`, {
-    method: "DELETE",
+    method: 'DELETE',
   });
   return response.json();
 }
