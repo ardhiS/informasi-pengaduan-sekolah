@@ -5,6 +5,18 @@ import { formatDate } from "../../../utils";
 import Loading from "../../../components/Loading";
 import { getComplaintDetails } from "../../../utils/api";
 
+function formatBytes(bytes, decimals = 2) {
+	if (!+bytes) return "0 Bytes";
+
+	const k = 1024;
+	const dm = decimals < 0 ? 0 : decimals;
+	const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+	const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+	return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
 export default function ComplaintDetailPage() {
 	const { complaintId } = useParams();
 	const [complaintData, setComplaintData] = useState(null);
@@ -23,6 +35,7 @@ export default function ComplaintDetailPage() {
 				priority,
 				created_at,
 				updated_at,
+				images,
 			} = complaintDetails.data.complaint;
 			setComplaintData({
 				id,
@@ -33,6 +46,7 @@ export default function ComplaintDetailPage() {
 				priority,
 				createdAt: formatDate(created_at),
 				updatedAt: formatDate(updated_at),
+				images: images || [],
 			});
 		}
 
@@ -107,31 +121,54 @@ export default function ComplaintDetailPage() {
 							<div className="mb-4">
 								<label className="form-label fw-semibold text-dark mb-3 fs-6">
 									<i className="bi bi-camera text-info me-2"></i>Bukti Pengaduan
-									(1)
+									({complaintData.images ? complaintData.images.length : 0})
 								</label>
-								<div className="card">
-									<div className="card-body p-3">
-										<div className="d-flex align-items-center">
-											<img
-												src="https://via.placeholder.com/80x80/e9ecef/6c757d?text=IMG"
-												alt="Bukti Pengaduan"
-												className="me-3 rounded"
-												style={{
-													width: "80px",
-													height: "80px",
-													objectFit: "cover",
-												}}
-											/>
-											<div className="flex-grow-1">
-												<h6 className="fw-semibold mb-1">bukti-merokok.png</h6>
-												<p className="text-muted small mb-2">Ukuran: 2.5 MB</p>
-												<a href="#" className="btn btn-sm btn-outline-info">
-													<i className="bi bi-download me-1"></i>Unduh
-												</a>
+								{complaintData.images && complaintData.images.length > 0 ? (
+									complaintData.images.map((image) => {
+										const imageUrl = image.imageUrl.replace(
+											"undefined",
+											"https://happy-corners-return-mysteriously.a276.dcdg.xyz",
+										);
+										return (
+											<div className="card mb-2" key={image.id}>
+												<div className="card-body p-3">
+													<div className="d-flex align-items-center">
+														<img
+															src={imageUrl}
+															alt={image.filename}
+															className="me-3 rounded"
+															style={{
+																width: "80px",
+																height: "80px",
+																objectFit: "cover",
+															}}
+														/>
+														<div className="flex-grow-1">
+															<h6 className="fw-semibold mb-1">
+																{image.filename}
+															</h6>
+															<p className="text-muted small mb-2">
+																Ukuran: {formatBytes(image.file_size)}
+															</p>
+															<a
+																href={imageUrl}
+																className="btn btn-sm btn-outline-info"
+																target="_blank"
+																rel="noopener noreferrer">
+																<i className="bi bi-download me-1"></i>
+																Unduh
+															</a>
+														</div>
+													</div>
+												</div>
 											</div>
-										</div>
+										);
+									})
+								) : (
+									<div className="alert alert-light">
+										Tidak ada bukti yang dilampirkan.
 									</div>
-								</div>
+								)}
 							</div>
 
 							{/* <!-- Status pengaduan --> */}
